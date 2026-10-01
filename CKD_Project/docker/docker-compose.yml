@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # 1. FastAPI Application Gateway & Web Portals
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ckd_healthcare_app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://ckd_admin:ckd_secure_password_2026@postgres:5432/ckd_healthcare_db
+      - SECRET_KEY=smart_ckd_super_secret_jwt_key_2026_healthcare_secure_token
+      - MONGODB_URL=mongodb://mongodb:27017
+      - ENABLE_MONGODB=true
+      - MONGODB_DB_NAME=ckd_healthcare_docs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+    volumes:
+      - ../uploads:/app/uploads
+      - ../ml/models:/app/ml/models
+
+  # 2. PostgreSQL Relational Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: ckd_postgres_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ckd_admin
+      POSTGRES_PASSWORD: ckd_secure_password_2026
+      POSTGRES_DB: ckd_healthcare_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ../database/indexes.sql:/docker-entrypoint-initdb.d/02-indexes.sql
+      - ../database/views.sql:/docker-entrypoint-initdb.d/03-views.sql
+      - ../database/triggers.sql:/docker-entrypoint-initdb.d/04-triggers.sql
+      - ../database/seed.sql:/docker-entrypoint-initdb.d/05-seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ckd_admin -d ckd_healthcare_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 3. MongoDB Document Database (Semi-Structured Clinical Notes & Audit)
+  mongodb:
+    image: mongo:6.0
+    container_name: ckd_mongodb_docs
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  postgres_data:
+  mongo_data:

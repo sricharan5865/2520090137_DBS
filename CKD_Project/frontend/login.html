@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - CKD Healthcare Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css?v=6">
+  <style>
+    :root {
+      --c-bg: #F8FAFC;
+      --c-ice: #D9E6F2;
+      --c-primary: #2F80ED;
+      --c-dark: #111827;
+      --c-accent: #10B981;
+      --c-primary-hover: #1D6CDA;
+      --c-ice-border: #C8DBEC;
+      --text-main: #111827;
+      --text-muted: #4B5563;
+      --text-dim: #6B7280;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+      background: url('/assets/medical_bg.png?v=6') no-repeat center center fixed !important;
+      background-size: cover !important;
+      color: #111827 !important;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(248, 250, 252, 0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .login-box {
+      width: 100%;
+      max-width: 480px;
+      background: rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      border: 1px solid rgba(217, 230, 242, 0.95) !important;
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 16px 40px rgba(17, 24, 39, 0.12) !important;
+    }
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      background: transparent !important;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin: 0 auto 14px auto;
+      box-shadow: none !important;
+    }
+    .role-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 28px;
+      background: #D9E6F2 !important;
+      padding: 6px;
+      border-radius: 10px;
+      border: 1px solid #C8DBEC !important;
+    }
+    .role-tab {
+      padding: 8px 4px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #4B5563 !important;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+    }
+    .role-tab:hover {
+      color: #111827 !important;
+    }
+    .role-tab.active {
+      background: #2F80ED !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 2px 8px rgba(47, 128, 237, 0.35) !important;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #111827 !important;
+    }
+    .form-label span.req {
+      color: #EF4444;
+    }
+    .form-control {
+      background: #FFFFFF !important;
+      border: 1px solid #C8DBEC !important;
+      border-radius: 8px;
+      padding: 11px 14px;
+      color: #111827 !important;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+    .form-control:focus {
+      border-color: #2F80ED !important;
+      box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.15) !important;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: #2F80ED !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 4px 12px rgba(47, 128, 237, 0.28) !important;
+    }
+    .btn-primary:hover {
+      background: #1D6CDA !important;
+      box-shadow: 0 6px 16px rgba(47, 128, 237, 0.38) !important;
+    }
+    .btn-secondary {
+      background: #D9E6F2 !important;
+      border: 1px solid #C8DBEC !important;
+      color: #111827 !important;
+    }
+    .btn-secondary:hover {
+      background: #C8DBEC !important;
+      color: #111827 !important;
+    }
+    .quick-demo-accounts {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #D9E6F2 !important;
+    }
+    .demo-btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="login-box">
+      <!-- Header -->
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div class="brand-logo" style="overflow:hidden; padding:0; background:transparent; border-radius:12px;">
+          <img src="/assets/kidney_logo.png?v=6" alt="CKD Logo" style="width:100%; height:100%; object-fit:contain; border-radius:12px; display:block;">
+        </div>
+        <h2 style="font-size: 22px; font-weight: 800; color: #111827;">
+          Hospital Portal Login
+        </h2>
+        <p style="font-size: 13px; color: #4B5563; margin-top: 4px; font-weight: 500;">
+          Role-Based Access Control & Healthcare Authentication
+        </p>
+      </div>
+
+      <!-- Role Selector Tabs -->
+      <div class="role-tabs">
+        <div class="role-tab active" data-role="PATIENT" onclick="selectRole('PATIENT')">Patient</div>
+        <div class="role-tab" data-role="DOCTOR" onclick="selectRole('DOCTOR')">Doctor</div>
+        <div class="role-tab" data-role="STAFF" onclick="selectRole('STAFF')">Staff</div>
+        <div class="role-tab" data-role="ADMIN" onclick="selectRole('ADMIN')">Admin</div>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label">Username or Email <span class="req">*</span></label>
+          <input type="text" id="username" class="form-control" placeholder="Enter username or email" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label class="form-label">Password <span class="req">*</span></label>
+          <input type="password" id="password" class="form-control" placeholder="Enter your secure password" required>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn btn-primary" style="width: 100%; padding: 12px;">
+          <i class="fa-solid fa-right-to-bracket"></i> Sign In to Portal
+        </button>
+      </form>
+
+      <!-- Quick Demo Login Helpers -->
+      <div class="quick-demo-accounts">
+        <p style="font-size: 12px; color: #6B7280; text-align: center; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">
+          1-Click Quick Demo Sign-In
+        </p>
+        <div class="demo-btn-grid">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('patient_john', 'Patient@123', 'PATIENT')">
+            <i class="fa-solid fa-user" style="color:#2F80ED;"></i> Patient John
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('dr_sarah', 'Doctor@123', 'DOCTOR')">
+            <i class="fa-solid fa-user-doctor" style="color:#2F80ED;"></i> Dr. Sarah
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('staff_james', 'Staff@123', 'STAFF')">
+            <i class="fa-solid fa-flask" style="color:#10B981;"></i> Staff James
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('admin', 'Admin@123', 'ADMIN')">
+            <i class="fa-solid fa-shield" style="color:#111827;"></i> Admin
+          </button>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div style="text-align: center; margin-top: 24px; font-size: 13px;">
+        <span style="color: #4B5563;">New patient?</span>
+        <a href="/register.html" style="font-weight: 700; color: #2F80ED; margin-left: 6px;">Register Patient Account</a>
+        <div style="margin-top: 10px;">
+          <a href="/" style="color: #6B7280; font-size: 12px; font-weight: 600;"><i class="fa-solid fa-arrow-left"></i> Back to Homepage</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    let currentRole = 'PATIENT';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const roleParam = urlParams.get('role');
+      if (roleParam && ['PATIENT', 'DOCTOR', 'STAFF', 'ADMIN'].includes(roleParam.toUpperCase())) {
+        selectRole(roleParam.toUpperCase());
+      } else {
+        quickFill('patient_john', 'Patient@123', 'PATIENT');
+      }
+    });
+
+    function selectRole(role) {
+      currentRole = role;
+      document.querySelectorAll('.role-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.role === role);
+      });
+    }
+
+    function quickFill(user, pass, role) {
+      document.getElementById('username').value = user;
+      document.getElementById('password').value = pass;
+      selectRole(role);
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const submitBtn = document.getElementById('submit-btn');
+
+      if (!username || !password) {
+        showToast('Please enter username and password', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+
+      try {
+        const authData = await API.login(username, password);
+        API.setAuth(authData.access_token, {
+          user_id: authData.user_id,
+          username: authData.username,
+          role: authData.role,
+          profile_id: authData.profile_id,
+          full_name: authData.full_name
+        });
+
+        showToast(`Welcome back, ${authData.full_name || authData.username}!`, 'success');
+
+        setTimeout(() => {
+          if (authData.role === 'ADMIN') window.location.href = '/admin/index.html';
+          else if (authData.role === 'DOCTOR') window.location.href = '/doctor/index.html';
+          else if (authData.role === 'STAFF') window.location.href = '/staff/index.html';
+          else if (authData.role === 'PATIENT') window.location.href = '/patient/index.html';
+          else window.location.href = '/';
+        }, 600);
+
+      } catch (err) {
+        showToast(err.message, 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In to Portal';
+      }
+    }
+  </script>
+</body>
+</html>

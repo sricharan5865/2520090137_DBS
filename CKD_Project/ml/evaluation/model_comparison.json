@@ -1,0 +1,60 @@
+{
+  "training_date": "2026-09-21 17:15:47",
+  "dataset_instances": 398,
+  "dataset_features": 24,
+  "train_samples": 318,
+  "test_samples": 80,
+  "models": {
+    "XGBoost": {
+      "version": "3.4.1",
+      "metrics": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "confusion_matrix": [
+          [
+            30,
+            0
+          ],
+          [
+            0,
+            50
+          ]
+        ]
+      },
+      "hyperparameters": {
+        "n_estimators": 100,
+        "max_depth": 4,
+        "learning_rate": 0.08
+      }
+    },
+    "LightGBM": {
+      "version": "4.7.0",
+      "metrics": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "roc_auc": 1.0,
+        "confusion_matrix": [
+          [
+            30,
+            0
+          ],
+          [
+            0,
+            50
+          ]
+        ]
+      },
+      "hyperparameters": {
+        "n_estimators": 100,
+        "max_depth": 4,
+        "learning_rate": 0.08
+      }
+    }
+  },
+  "selected_model": "XGBoost"
+}

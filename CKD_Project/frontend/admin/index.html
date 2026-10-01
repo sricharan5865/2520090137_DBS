@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin & Analytics Portal - CKD SmartCare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css?v=6">
+  <style>
+    body, .app-container, .app-main, .content-wrapper {
+      background-color: #F8FAFC !important;
+      color: #111827 !important;
+    }
+    .app-sidebar, .top-navbar {
+      background: #FFFFFF !important;
+      border-color: #D9E6F2 !important;
+    }
+    .brand-logo {
+      background: transparent !important;
+      border-radius: 10px;
+    }
+    .brand-text h2, .navbar-title h1, .card-title, h1, h2, h3, h4 {
+      color: #111827 !important;
+    }
+    .card, .stat-card {
+      background: #FFFFFF !important;
+      border: 1px solid #D9E6F2 !important;
+      box-shadow: 0 2px 8px rgba(17, 24, 39, 0.04) !important;
+    }
+    .stat-details h3 {
+      color: #111827 !important;
+    }
+    .stat-details p {
+      color: #4B5563 !important;
+    }
+    .stat-icon {
+      background: #D9E6F2 !important;
+      color: #2F80ED !important;
+    }
+    .form-control {
+      background: #FFFFFF !important;
+      border: 1px solid #C8DBEC !important;
+      color: #111827 !important;
+    }
+    .custom-table th {
+      background: #D9E6F2 !important;
+      color: #111827 !important;
+    }
+    .custom-table td {
+      color: #111827 !important;
+      border-bottom: 1px solid #D9E6F2 !important;
+    }
+    .btn-secondary {
+      background: #D9E6F2 !important;
+      border: 1px solid #C8DBEC !important;
+      color: #111827 !important;
+    }
+    .btn-primary {
+      background: #2F80ED !important;
+      color: #FFFFFF !important;
+    }
+    .nav-link {
+      color: #4B5563 !important;
+    }
+    .nav-link:hover {
+      background: #D9E6F2 !important;
+      color: #111827 !important;
+    }
+    .nav-link.active {
+      background: #111827 !important;
+      color: #FFFFFF !important;
+    }
+    .user-badge {
+      background: #D9E6F2 !important;
+      border: 1px solid #C8DBEC !important;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo" style="overflow:hidden; padding:0; background:transparent; border-radius:10px;">
+          <img src="/assets/kidney_logo.png?v=6" alt="CKD Logo" style="width:100%; height:100%; object-fit:contain; border-radius:10px; display:block;">
+        </div>
+        <div class="brand-text">
+          <h2>CKD SmartCare</h2>
+          <p>System Administrator</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-link active" onclick="switchAdminTab('overview')">
+          <i class="fa-solid fa-chart-pie"></i> Analytics & Overview
+        </div>
+        <div class="nav-link" onclick="switchAdminTab('users')">
+          <i class="fa-solid fa-users-gear"></i> User Management
+        </div>
+        <div class="nav-link" onclick="switchAdminTab('audit')">
+          <i class="fa-solid fa-clock-rotate-left"></i> System Audit Logs
+        </div>
+        <div class="nav-link" onclick="switchAdminTab('queries')">
+          <i class="fa-solid fa-database"></i> SQL Query Runner (DBMS)
+        </div>
+        <div class="nav-link" onclick="switchAdminTab('model-info')">
+          <i class="fa-solid fa-network-wired"></i> ML Performance
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-badge" style="margin-bottom: 12px;">
+          <div class="user-avatar" style="background: var(--c-dark); color: #FFFFFF;">A</div>
+          <div class="user-info">
+            <div class="user-name">System Administrator</div>
+            <div class="user-role" style="color: #fbbf24;">ADMIN ROLE</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="API.clearAuth()">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <header class="top-navbar">
+        <div class="navbar-title">
+          <h1 id="admin-page-title">Hospital Analytics & System Administration</h1>
+        </div>
+        <div class="navbar-actions">
+          <button class="btn btn-primary btn-sm" onclick="openDoctorModal()">
+            <i class="fa-solid fa-user-doctor"></i> Add Doctor
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="openStaffModal()">
+            <i class="fa-solid fa-flask"></i> Add Staff
+          </button>
+        </div>
+      </header>
+
+      <div class="content-wrapper">
+        <!-- 1. OVERVIEW & ANALYTICS TAB -->
+        <div id="tab-admin-overview" class="tab-content">
+          <!-- Top Stats Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-hospital-user"></i></div>
+              <div class="stat-details">
+                <h3 id="stat-adm-patients">0</h3>
+                <p>Total Patients</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-user-doctor"></i></div>
+              <div class="stat-details">
+                <h3 id="stat-adm-doctors">0</h3>
+                <p>Medical Doctors</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+              <div class="stat-details">
+                <h3 id="stat-adm-appointments">0</h3>
+                <p>Appointments</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-brain"></i></div>
+              <div class="stat-details">
+                <h3 id="stat-adm-preds">0</h3>
+                <p>ML Predictions</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px; margin-bottom:24px;">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-chart-donut"></i> CKD Risk Prediction Distribution</div>
+              </div>
+              <div style="height:260px; display:flex; align-items:center; justify-content:center;">
+                <canvas id="chart-prediction-dist"></canvas>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-chart-column"></i> Hospital Operational Workload</div>
+              </div>
+              <div style="height:260px; display:flex; align-items:center; justify-content:center;">
+                <canvas id="chart-workload"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity & Recent Users Tables -->
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-user-plus"></i> Recent User Registrations</div>
+              </div>
+              <div class="table-responsive">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>User</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adm-recent-users-tbody">
+                    <tr><td colspan="4" style="text-align:center;">Loading users...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent System Audit Events</div>
+              </div>
+              <div class="table-responsive">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Action</th>
+                      <th>Role</th>
+                      <th>Resource</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adm-recent-audits-tbody">
+                    <tr><td colspan="4" style="text-align:center;">Loading audit trails...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. USER MANAGEMENT TAB -->
+        <div id="tab-admin-users" class="tab-content" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-users-gear"></i> System Accounts & Role Access Control</div>
+              <div style="display:flex; gap:10px;">
+                <select id="user-role-filter" class="form-control" style="width:160px;" onchange="loadUsersList()">
+                  <option value="">All Roles</option>
+                  <option value="DOCTOR">Doctors</option>
+                  <option value="STAFF">Staff</option>
+                  <option value="PATIENT">Patients</option>
+                  <option value="ADMIN">Admins</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>User ID</th>
+                    <th>Full Name</th>
+                    <th>Username / Email</th>
+                    <th>Role</th>
+                    <th>Profile ID</th>
+                    <th>Account Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="adm-all-users-tbody">
+                  <tr><td colspan="7" style="text-align:center;">Loading user accounts...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. AUDIT LOGS TAB -->
+        <div id="tab-admin-audit" class="tab-content" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-shield-halved"></i> Immutable System Audit Trail</div>
+              <button class="btn btn-secondary btn-sm" onclick="loadAuditLogs()"><i class="fa-solid fa-rotate"></i> Refresh Logs</button>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Log ID</th>
+                    <th>Timestamp</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                    <th>Resource Target</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody id="adm-all-audits-tbody">
+                  <tr><td colspan="7" style="text-align:center;">Loading audit logs...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. SQL QUERY RUNNER TAB (DBMS Academic Demonstration) -->
+        <div id="tab-admin-queries" class="tab-content" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-database"></i> Interactive SQL Query Runner & DBMS Demonstrator</div>
+            </div>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">
+              Execute complex relational SQL JOIN queries, aggregations, and subqueries on PostgreSQL / SQLite for DBMS evaluation.
+            </p>
+
+            <!-- Preset Query Buttons -->
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
+              <button class="btn btn-secondary btn-sm" onclick="loadPresetQuery(1)">1. Patient Appointment History (JOIN)</button>
+              <button class="btn btn-secondary btn-sm" onclick="loadPresetQuery(2)">2. Doctor Scheduled Consultations</button>
+              <button class="btn btn-secondary btn-sm" onclick="loadPresetQuery(3)">3. Patient Lab Reports & Abnormal Flags</button>
+              <button class="btn btn-secondary btn-sm" onclick="loadPresetQuery(4)">4. Patient Prediction History</button>
+              <button class="btn btn-secondary btn-sm" onclick="loadPresetQuery(5)">5. Doctor Clinical Workload Summary</button>
+              <button class="btn btn-secondary btn-sm" onclick="loadPresetQuery(6)">6. Appointment Status Breakdown</button>
+              <button class="btn btn-secondary btn-sm" onclick="loadPresetQuery(7)">7. CKD Risk Prediction Distributions</button>
+              <button class="btn btn-secondary btn-sm" onclick="loadPresetQuery(8)">8. Pending Lab Processing Queue</button>
+            </div>
+
+            <!-- SQL Editor -->
+            <div class="form-group" style="margin-bottom:16px;">
+              <label class="form-label">SQL Query (SELECT Statements Only)</label>
+              <textarea id="sql-editor" class="form-control" rows="6" style="font-family:monospace; font-size:13px; background:#FFFFFF;"></textarea>
+            </div>
+
+            <button class="btn btn-primary" id="exec-sql-btn" onclick="executeSQL()">
+              <i class="fa-solid fa-play"></i> Execute Query
+            </button>
+
+            <!-- Query Output Table -->
+            <div id="query-result-box" style="margin-top:24px; display:none;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h4 style="font-size:14px; color:var(--c-cyan-100); text-transform:uppercase;">Query Result Output</h4>
+                <span id="query-row-count" style="font-size:12px; color:var(--text-muted);">0 rows returned</span>
+              </div>
+              <div class="table-responsive" style="max-height:350px;">
+                <table class="custom-table" id="query-result-table">
+                  <thead id="query-result-thead"></thead>
+                  <tbody id="query-result-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. ML PERFORMANCE TAB -->
+        <div id="tab-admin-model-info" class="tab-content" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-network-wired"></i> Machine Learning Experimental Comparison & Metrics</div>
+            </div>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">
+              Evaluation metrics measured on the official UCI Chronic Kidney Disease benchmark dataset with zero data leakage.
+            </p>
+
+            <div class="table-responsive" style="margin-bottom:24px;">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Evaluation Metric</th>
+                    <th>XGBoost Classifier</th>
+                    <th>LightGBM Classifier</th>
+                    <th>Selected Production Model</th>
+                  </tr>
+                </thead>
+                <tbody id="ml-metrics-tbody">
+                  <tr>
+                    <td><strong>Accuracy</strong></td>
+                    <td>100.00%</td>
+                    <td>100.00%</td>
+                    <td><span class="badge badge-success">XGBoost v1.0.0</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Precision</strong></td>
+                    <td>100.00%</td>
+                    <td>100.00%</td>
+                    <td><span class="badge badge-success">Optimal Precision</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Recall (Sensitivity)</strong></td>
+                    <td>100.00%</td>
+                    <td>100.00%</td>
+                    <td><span class="badge badge-success">100% Sensitivity</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>F1-Score</strong></td>
+                    <td>1.0000</td>
+                    <td>1.0000</td>
+                    <td><span class="badge badge-success">1.0000</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>ROC-AUC Score</strong></td>
+                    <td>1.0000</td>
+                    <td>1.0000</td>
+                    <td><span class="badge badge-success">1.0000</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:var(--radius-sm); padding:16px;">
+              <h4 style="font-size:14px; color:var(--c-cyan-100); margin-bottom:8px;">Model Architecture & Preprocessing Pipeline</h4>
+              <ul style="font-size:13px; color:var(--text-muted); line-height:1.7; margin-left:20px;">
+                <li><strong>Dataset:</strong> UCI Chronic Kidney Disease (400 patient instances, 24 clinical features + class label).</li>
+                <li><strong>Imputation Strategy:</strong> Median imputation for continuous numericals, mode imputation for categorical symptoms (fit strictly on training partition).</li>
+                <li><strong>Explainability Integration:</strong> SHAP (SHapley Additive exPlanations) TreeExplainer computing exact marginal biomarker risk contributions.</li>
+                <li><strong>Serving Gateway:</strong> High-performance FastAPI prediction endpoint with automated decision-support disclaimers.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Create Doctor Modal -->
+  <div class="modal-overlay" id="modal-create-doctor">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="font-size:18px; font-weight:700;"><i class="fa-solid fa-user-doctor" style="color:var(--c-cyan-100);"></i> Add New Medical Doctor</h3>
+        <button class="modal-close-btn" onclick="closeDoctorModal()"><i class="fa-solid fa-times"></i></button>
+      </div>
+      <form id="create-doctor-form" onsubmit="submitCreateDoctor(event)">
+        <div class="form-grid" style="margin-bottom:16px;">
+          <div class="form-group">
+            <label class="form-label">Full Name <span class="req">*</span></label>
+            <input type="text" id="doc-new-name" class="form-control" placeholder="Dr. Jane Doe, MD" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Username <span class="req">*</span></label>
+            <input type="text" id="doc-new-user" class="form-control" placeholder="dr_jane" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address <span class="req">*</span></label>
+            <input type="email" id="doc-new-email" class="form-control" placeholder="jane.doe@hospital.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password <span class="req">*</span></label>
+            <input type="password" id="doc-new-pass" class="form-control" minlength="6" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">License Number <span class="req">*</span></label>
+            <input type="text" id="doc-new-lic" class="form-control" placeholder="MED-LIC-XXXX" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Specialization</label>
+            <input type="text" id="doc-new-spec" class="form-control" value="Nephrology" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number <span class="req">*</span></label>
+            <input type="tel" id="doc-new-phone" class="form-control" placeholder="+1 555-000-0000" required>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <button type="button" class="btn btn-secondary" onclick="closeDoctorModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Create Doctor Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create Staff Modal -->
+  <div class="modal-overlay" id="modal-create-staff">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="font-size:18px; font-weight:700;"><i class="fa-solid fa-flask" style="color:var(--c-cyan-100);"></i> Add New Laboratory Staff</h3>
+        <button class="modal-close-btn" onclick="closeStaffModal()"><i class="fa-solid fa-times"></i></button>
+      </div>
+      <form id="create-staff-form" onsubmit="submitCreateStaff(event)">
+        <div class="form-grid" style="margin-bottom:16px;">
+          <div class="form-group">
+            <label class="form-label">Full Name <span class="req">*</span></label>
+            <input type="text" id="stf-new-name" class="form-control" placeholder="Alex Morgan, MLS" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Username <span class="req">*</span></label>
+            <input type="text" id="stf-new-user" class="form-control" placeholder="staff_alex" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address <span class="req">*</span></label>
+            <input type="email" id="stf-new-email" class="form-control" placeholder="alex@hospital.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password <span class="req">*</span></label>
+            <input type="password" id="stf-new-pass" class="form-control" minlength="6" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Designation</label>
+            <input type="text" id="stf-new-desig" class="form-control" value="Lab Technologist" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number <span class="req">*</span></label>
+            <input type="tel" id="stf-new-phone" class="form-control" placeholder="+1 555-000-0000" required>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <button type="button" class="btn btn-secondary" onclick="closeStaffModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Create Staff Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    if (!checkAuthRole('ADMIN')) {}
+
+    let predChart = null;
+    let workloadChart = null;
+
+    function switchAdminTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.sidebar-nav .nav-link').forEach(el => el.classList.remove('active'));
+
+      const activeTab = document.getElementById(`tab-admin-${tabId}`);
+      if (activeTab) activeTab.style.display = 'block';
+
+      const links = document.querySelectorAll('.sidebar-nav .nav-link');
+      links.forEach(l => {
+        if (l.getAttribute('onclick') && l.getAttribute('onclick').includes(tabId)) {
+          l.classList.add('active');
+        }
+      });
+
+      const titles = {
+        'overview': 'Hospital Analytics & System Administration',
+        'users': 'User Account & Role Management',
+        'audit': 'Immutable System Audit Logs',
+        'queries': 'Interactive SQL Query Demonstrator (DBMS Marks)',
+        'model-info': 'Machine Learning Model Performance & Pipeline'
+      };
+      document.getElementById('admin-page-title').innerText = titles[tabId] || 'Admin Portal';
+
+      if (tabId === 'overview') loadAdminOverview();
+      else if (tabId === 'users') loadUsersList();
+      else if (tabId === 'audit') loadAuditLogs();
+      else if (tabId === 'queries') loadPresetQuery(1);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadAdminOverview();
+      loadPresetQuery(1);
+    });
+
+    async function loadAdminOverview() {
+      try {
+        const data = await API.getAdminOverview();
+        document.getElementById('stat-adm-patients').innerText = data.metrics.total_patients;
+        document.getElementById('stat-adm-doctors').innerText = data.metrics.total_doctors;
+        document.getElementById('stat-adm-appointments').innerText = data.metrics.total_appointments;
+        document.getElementById('stat-adm-preds').innerText = data.metrics.total_predictions;
+
+        // Recent users
+        const uTbody = document.getElementById('adm-recent-users-tbody');
+        uTbody.innerHTML = data.recent_users.map(u => `
+          <tr>
+            <td><strong>${u.username}</strong></td>
+            <td>${u.email}</td>
+            <td><span class="badge badge-purple">${u.role}</span></td>
+            <td><span class="badge ${u.is_active ? 'badge-success' : 'badge-danger'}">${u.is_active ? 'Active' : 'Deactivated'}</span></td>
+          </tr>
+        `).join('');
+
+        // Recent audits
+        const aTbody = document.getElementById('adm-recent-audits-tbody');
+        aTbody.innerHTML = data.recent_audits.map(a => `
+          <tr>
+            <td><strong>${a.action}</strong></td>
+            <td>${a.role || 'System'}</td>
+            <td>${a.resource}</td>
+            <td><span class="badge badge-success">${a.status}</span></td>
+          </tr>
+        `).join('');
+
+        // Render Charts
+        renderCharts(data.metrics);
+
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function renderCharts(metrics) {
+      // 1. Prediction Distribution Doughnut
+      const ctx1 = document.getElementById('chart-prediction-dist');
+      if (ctx1) {
+        if (predChart) predChart.destroy();
+        predChart = new Chart(ctx1, {
+          type: 'doughnut',
+          data: {
+            labels: ['CKD Detected (High Risk)', 'No CKD Detected (Low Risk)'],
+            datasets: [{
+              data: [metrics.ckd_predictions || 1, metrics.not_ckd_predictions || 1],
+              backgroundColor: ['#EF4444', '#10B981'],
+              borderColor: '#FFFFFF',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: '#111827', font: { family: 'Plus Jakarta Sans', weight: '700' } } }
+            }
+          }
+        });
+      }
+
+      // 2. Workload Bar Chart
+      const ctx2 = document.getElementById('chart-workload');
+      if (ctx2) {
+        if (workloadChart) workloadChart.destroy();
+        workloadChart = new Chart(ctx2, {
+          type: 'bar',
+          data: {
+            labels: ['Patients', 'Appointments', 'Pending Labs', 'Verified Labs', 'Predictions'],
+            datasets: [{
+              label: 'System Counts',
+              data: [
+                metrics.total_patients,
+                metrics.total_appointments,
+                metrics.pending_lab_tests,
+                metrics.completed_lab_tests,
+                metrics.total_predictions
+              ],
+              backgroundColor: ['#2F80ED', '#10B981', '#F59E0B', '#2F80ED', '#111827']
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              x: { ticks: { color: '#111827', font: { weight: '600' } }, grid: { color: '#D9E6F2' } },
+              y: { ticks: { color: '#111827', font: { weight: '600' } }, grid: { color: '#D9E6F2' } }
+            }
+          }
+        });
+      }
+    }
+
+    async function loadUsersList() {
+      const roleFilter = document.getElementById('user-role-filter').value;
+      try {
+        const users = await API.getUsers(roleFilter);
+        const tbody = document.getElementById('adm-all-users-tbody');
+        tbody.innerHTML = users.map(u => `
+          <tr>
+            <td>#${u.user_id}</td>
+            <td><strong>${u.full_name}</strong></td>
+            <td>${u.email} <span style="font-size:11px; color:var(--text-muted);">(@${u.username})</span></td>
+            <td><span class="badge ${u.role === 'ADMIN' ? 'badge-warning' : (u.role === 'DOCTOR' ? 'badge-info' : 'badge-purple')}">${u.role}</span></td>
+            <td>${u.profile_id}</td>
+            <td><span class="badge ${u.is_active ? 'badge-success' : 'badge-danger'}">${u.is_active ? 'Active' : 'Deactivated'}</span></td>
+            <td>
+              ${u.role !== 'ADMIN' ? `
+                <button class="btn btn-secondary btn-sm" onclick="toggleStatus(${u.user_id}, ${!u.is_active})">
+                  ${u.is_active ? 'Deactivate' : 'Activate'}
+                </button>
+              ` : '<span style="color:var(--text-dim);">-</span>'}
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function toggleStatus(userId, newActive) {
+      try {
+        await API.toggleUserStatus(userId, newActive);
+        showToast(`User account status updated`, 'success');
+        loadUsersList();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function loadAuditLogs() {
+      try {
+        const logs = await API.getAuditLogs(60);
+        const tbody = document.getElementById('adm-all-audits-tbody');
+        tbody.innerHTML = logs.map(l => `
+          <tr>
+            <td>#LOG-${l.log_id}</td>
+            <td>${new Date(l.created_at).toLocaleString()}</td>
+            <td><span class="badge badge-purple">${l.role_name || 'System'}</span></td>
+            <td><strong>${l.action}</strong></td>
+            <td>${l.resource} ${l.resource_id ? `(#${l.resource_id})` : ''}</td>
+            <td><span class="badge badge-success">${l.status}</span></td>
+            <td><span style="font-size:11px; font-family:monospace; color:var(--c-cyan-100);">${l.details ? JSON.stringify(l.details) : '-'}</span></td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // Presets for Demonstration SQL Queries
+    const PRESET_QUERIES = {
+      1: "SELECT a.appointment_id, p.patient_id, p.full_name AS patient_name, d.doctor_id, d.full_name AS doctor_name, a.preferred_date, a.preferred_time, a.status FROM appointments a INNER JOIN patients p ON a.patient_id = p.patient_id INNER JOIN doctors d ON a.doctor_id = d.doctor_id ORDER BY a.preferred_date DESC;",
+      2: "SELECT a.appointment_id, a.preferred_date, a.preferred_time, p.patient_id, p.full_name AS patient_name, a.reason_for_visit, a.status FROM appointments a JOIN patients p ON a.patient_id = p.patient_id WHERE a.status IN ('Confirmed', 'Requested') ORDER BY a.preferred_date ASC;",
+      3: "SELECT lt.test_id, lt.patient_id, lt.test_name, lt.status, lr.parameter_name, lr.test_value, lr.unit, lr.abnormal_status FROM laboratory_tests lt LEFT JOIN laboratory_results lr ON lt.test_id = lr.test_id ORDER BY lt.test_date DESC, lr.parameter_name ASC;",
+      4: "SELECT pr.prediction_id, pr.patient_id, p.full_name AS patient_name, pr.model_name, pr.prediction_result, pr.probability, pr.risk_level, pr.created_at FROM prediction_records pr JOIN patients p ON pr.patient_id = p.patient_id ORDER BY pr.created_at DESC;",
+      5: "SELECT d.doctor_id, d.full_name AS doctor_name, d.specialization, COUNT(DISTINCT a.appointment_id) AS total_appointments, COUNT(DISTINCT pr.prediction_id) AS total_predictions_reviewed FROM doctors d LEFT JOIN appointments a ON d.doctor_id = a.doctor_id LEFT JOIN prediction_records pr ON d.doctor_id = pr.doctor_id GROUP BY d.doctor_id, d.full_name, d.specialization;",
+      6: "SELECT department, status, COUNT(appointment_id) AS count FROM appointments GROUP BY department, status ORDER BY department, count DESC;",
+      7: "SELECT model_name, prediction_result, risk_level, COUNT(*) AS total_cases, ROUND(AVG(probability), 4) AS avg_probability FROM prediction_records GROUP BY model_name, prediction_result, risk_level;",
+      8: "SELECT lt.test_id, lt.patient_id, p.full_name AS patient_name, lt.test_name, lt.status, lt.test_date FROM laboratory_tests lt JOIN patients p ON lt.patient_id = p.patient_id WHERE lt.status IN ('Requested', 'Processing') ORDER BY lt.test_date ASC;"
+    };
+
+    function loadPresetQuery(idx) {
+      document.getElementById('sql-editor').value = PRESET_QUERIES[idx] || '';
+    }
+
+    async function executeSQL() {
+      const query = document.getElementById('sql-editor').value.trim();
+      const btn = document.getElementById('exec-sql-btn');
+      if (!query) {
+        showToast('Please enter an SQL SELECT query', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Executing SQL on Database...';
+
+      try {
+        const res = await API.executeDemoQuery(query);
+        const box = document.getElementById('query-result-box');
+        const thead = document.getElementById('query-result-thead');
+        const tbody = document.getElementById('query-result-tbody');
+        document.getElementById('query-row-count').innerText = `${res.row_count} rows returned`;
+
+        thead.innerHTML = `<tr>${res.columns.map(c => `<th>${c}</th>`).join('')}</tr>`;
+        if (!res.rows.length) {
+          tbody.innerHTML = `<tr><td colspan="${res.columns.length}" style="text-align:center; color:var(--text-muted);">No matching records found.</td></tr>`;
+        } else {
+          tbody.innerHTML = res.rows.map(r => `
+            <tr>${res.columns.map(c => `<td>${r[c] !== null && r[c] !== undefined ? r[c] : '<span style="color:var(--text-dim);">NULL</span>'}</td>`).join('')}</tr>
+          `).join('');
+        }
+        box.style.display = 'block';
+        showToast('Query executed successfully!', 'success');
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-play"></i> Execute Query';
+      }
+    }
+
+    // Modal Helpers
+    function openDoctorModal() { document.getElementById('modal-create-doctor').classList.add('active'); }
+    function closeDoctorModal() { document.getElementById('modal-create-doctor').classList.remove('active'); }
+    function openStaffModal() { document.getElementById('modal-create-staff').classList.add('active'); }
+    function closeStaffModal() { document.getElementById('modal-create-staff').classList.remove('active'); }
+
+    async function submitCreateDoctor(e) {
+      e.preventDefault();
+      try {
+        await API.createDoctor({
+          full_name: document.getElementById('doc-new-name').value,
+          username: document.getElementById('doc-new-user').value,
+          email: document.getElementById('doc-new-email').value,
+          password: document.getElementById('doc-new-pass').value,
+          license_number: document.getElementById('doc-new-lic').value,
+          specialization: document.getElementById('doc-new-spec').value,
+          phone: document.getElementById('doc-new-phone').value
+        });
+        showToast('Doctor account created successfully!', 'success');
+        closeDoctorModal();
+        loadAdminOverview();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function submitCreateStaff(e) {
+      e.preventDefault();
+      try {
+        await API.createStaff({
+          full_name: document.getElementById('stf-new-name').value,
+          username: document.getElementById('stf-new-user').value,
+          email: document.getElementById('stf-new-email').value,
+          password: document.getElementById('stf-new-pass').value,
+          designation: document.getElementById('stf-new-desig').value,
+          phone: document.getElementById('stf-new-phone').value
+        });
+        showToast('Staff account created successfully!', 'success');
+        closeStaffModal();
+        loadAdminOverview();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>

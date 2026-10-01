@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff & Laboratory Portal - CKD SmartCare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css?v=6">
+  <style>
+    body, .app-container, .app-main, .content-wrapper {
+      background-color: #F8FAFC !important;
+      color: #111827 !important;
+    }
+    .app-sidebar, .top-navbar {
+      background: #FFFFFF !important;
+      border-color: #D9E6F2 !important;
+    }
+    .brand-logo {
+      background: transparent !important;
+      border-radius: 10px;
+    }
+    .brand-text h2, .navbar-title h1, .card-title, h1, h2, h3, h4 {
+      color: #111827 !important;
+    }
+    .card, .stat-card {
+      background: #FFFFFF !important;
+      border: 1px solid #D9E6F2 !important;
+      box-shadow: 0 2px 8px rgba(17, 24, 39, 0.04) !important;
+    }
+    .stat-details h3 {
+      color: #111827 !important;
+    }
+    .stat-details p {
+      color: #4B5563 !important;
+    }
+    .stat-icon {
+      background: #D9E6F2 !important;
+      color: #10B981 !important;
+    }
+    .form-control {
+      background: #FFFFFF !important;
+      border: 1px solid #C8DBEC !important;
+      color: #111827 !important;
+    }
+    .custom-table th {
+      background: #D9E6F2 !important;
+      color: #111827 !important;
+    }
+    .custom-table td {
+      color: #111827 !important;
+      border-bottom: 1px solid #D9E6F2 !important;
+    }
+    .btn-secondary {
+      background: #D9E6F2 !important;
+      border: 1px solid #C8DBEC !important;
+      color: #111827 !important;
+    }
+    .btn-primary {
+      background: #2F80ED !important;
+      color: #FFFFFF !important;
+    }
+    .nav-link {
+      color: #4B5563 !important;
+    }
+    .nav-link:hover {
+      background: #D9E6F2 !important;
+      color: #111827 !important;
+    }
+    .nav-link.active {
+      background: #10B981 !important;
+      color: #FFFFFF !important;
+    }
+    .user-badge {
+      background: #D9E6F2 !important;
+      border: 1px solid #C8DBEC !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo" style="overflow:hidden; padding:0; background:transparent; border-radius:10px;">
+          <img src="/assets/kidney_logo.png?v=6" alt="CKD Logo" style="width:100%; height:100%; object-fit:contain; border-radius:10px; display:block;">
+        </div>
+        <div class="brand-text">
+          <h2>CKD SmartCare</h2>
+          <p>Laboratory Staff</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-link active" onclick="switchStaffTab('overview')">
+          <i class="fa-solid fa-gauge"></i> Overview
+        </div>
+        <div class="nav-link" onclick="switchStaffTab('pending')">
+          <i class="fa-solid fa-list-check"></i> Pending Lab Tests
+        </div>
+        <div class="nav-link" onclick="switchStaffTab('completed')">
+          <i class="fa-solid fa-circle-check"></i> Completed & Verified
+        </div>
+        <div class="nav-link" onclick="switchStaffTab('notifications')">
+          <i class="fa-solid fa-bell"></i> Notifications
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-badge" style="margin-bottom: 12px;">
+          <div class="user-avatar" id="staff-avatar" style="background: var(--c-accent); color: #FFFFFF;">S</div>
+          <div class="user-info">
+            <div class="user-name" id="staff-name">James Wilson</div>
+            <div class="user-role">Lab Technologist</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="API.clearAuth()">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <header class="top-navbar">
+        <div class="navbar-title">
+          <h1 id="staff-page-title">Diagnostic Laboratory Queue</h1>
+        </div>
+        <div class="navbar-actions">
+          <button class="notif-bell-btn" onclick="switchStaffTab('notifications')">
+            <i class="fa-regular fa-bell"></i>
+            <span class="notif-badge" id="staff-notif-badge" style="display:none;"></span>
+          </button>
+        </div>
+      </header>
+
+      <div class="content-wrapper">
+        <!-- 1. OVERVIEW TAB -->
+        <div id="tab-staff-overview" class="tab-content">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+              <div class="stat-details">
+                <h3 id="stat-staff-pending">0</h3>
+                <p>Pending Test Requests</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-vial-circle-check"></i></div>
+              <div class="stat-details">
+                <h3 id="stat-staff-completed">0</h3>
+                <p>Verified Reports</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+              <div class="stat-details">
+                <h3 id="stat-staff-patients">0</h3>
+                <p>Total Patients</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending Requests Queue Table -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-flask"></i> Urgent Requisitions Awaiting Processing</div>
+              <button class="btn btn-secondary btn-sm" onclick="loadStaffData()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Test ID</th>
+                    <th>Patient ID</th>
+                    <th>Patient Name</th>
+                    <th>Test Panel</th>
+                    <th>Sample</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="staff-pending-overview-tbody">
+                  <tr><td colspan="8" style="text-align:center;">Loading lab queue...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. PENDING LAB TESTS TAB -->
+        <div id="tab-staff-pending" class="tab-content" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-vial"></i> All Pending Lab Tests</div>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Test ID</th>
+                    <th>Patient</th>
+                    <th>Panel</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="staff-all-pending-tbody">
+                  <tr><td colspan="6" style="text-align:center;">Loading pending tests...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. COMPLETED LAB TESTS TAB -->
+        <div id="tab-staff-completed" class="tab-content" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-circle-check"></i> Completed & Verified Lab Reports</div>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Test ID</th>
+                    <th>Patient</th>
+                    <th>Panel</th>
+                    <th>Technician</th>
+                    <th>Status</th>
+                    <th>Parameters</th>
+                    <th>File</th>
+                  </tr>
+                </thead>
+                <tbody id="staff-completed-tbody">
+                  <tr><td colspan="7" style="text-align:center;">Loading verified reports...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. NOTIFICATIONS TAB -->
+        <div id="tab-staff-notifications" class="tab-content" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-bell"></i> Laboratory Notifications</div>
+              <button class="btn btn-secondary btn-sm" onclick="markAllStaffRead()"><i class="fa-solid fa-check-double"></i> Mark All Read</button>
+            </div>
+            <div id="staff-notifications-list">
+              <p style="color: var(--text-muted);">Loading notifications...</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Enter Results Modal -->
+  <div class="modal-overlay" id="enter-results-modal">
+    <div class="modal-content" style="max-width:700px;">
+      <div class="modal-header">
+        <h3 style="font-size:18px; font-weight:700;"><i class="fa-solid fa-flask" style="color:var(--c-cyan-100);"></i> Enter Laboratory Biomarker Results</h3>
+        <button class="modal-close-btn" onclick="closeResultsModal()"><i class="fa-solid fa-times"></i></button>
+      </div>
+      <form id="results-form" onsubmit="submitLabResults(event)">
+        <input type="hidden" id="modal-test-id">
+        <div style="background:var(--c-ice); padding:14px; border-radius:var(--radius-sm); margin-bottom:16px; border:1px solid var(--c-ice-border);">
+          <p id="modal-patient-info" style="font-size:13px; font-weight:700; color:var(--c-dark);">Patient: Johnathan Miller (#LAB-1)</p>
+        </div>
+
+        <h4 style="font-size:13px; color:var(--c-cyan-100); margin-bottom:10px; text-transform:uppercase;">Core Renal Biomarkers</h4>
+        <div class="form-grid" style="margin-bottom:16px;">
+          <div class="form-group">
+            <label class="form-label">Serum Creatinine (mg/dL) [Ref: 0.6 - 1.2]</label>
+            <input type="number" step="0.01" id="res-sc" class="form-control" placeholder="e.g. 1.2" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Blood Urea Nitrogen (mg/dL) [Ref: 7 - 20]</label>
+            <input type="number" step="0.1" id="res-bu" class="form-control" placeholder="e.g. 25" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Urine Specific Gravity [Ref: 1.015 - 1.025]</label>
+            <select id="res-sg" class="form-control" required>
+              <option value="1.005">1.005 (Low)</option>
+              <option value="1.010">1.010 (Low)</option>
+              <option value="1.015">1.015 (Normal)</option>
+              <option value="1.020">1.020 (Normal)</option>
+              <option value="1.025">1.025 (Normal)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hemoglobin (g/dL) [Ref: 13.5 - 17.5]</label>
+            <input type="number" step="0.1" id="res-hemo" class="form-control" placeholder="e.g. 13.8" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Serum Sodium (mEq/L) [Ref: 135 - 145]</label>
+            <input type="number" step="0.1" id="res-sod" class="form-control" placeholder="e.g. 140" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Serum Potassium (mEq/L) [Ref: 3.5 - 5.0]</label>
+            <input type="number" step="0.1" id="res-pot" class="form-control" placeholder="e.g. 4.3" required>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">Technician Verification Comments</label>
+          <textarea id="res-comments" class="form-control" rows="2" placeholder="Notes on sample quality, spectrophotometer readings, abnormal flags..."></textarea>
+        </div>
+
+        <div class="form-group" style="margin-bottom:20px;">
+          <label class="form-label">Upload Official PDF / Image Diagnostic Report (Optional)</label>
+          <input type="file" id="res-file" class="form-control" accept=".pdf,.png,.jpg,.jpeg">
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <button type="button" class="btn btn-secondary" onclick="closeResultsModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Save & Verify Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    if (!checkAuthRole('STAFF')) {}
+
+    const user = API.getUser();
+    if (user) {
+      document.getElementById('staff-name').innerText = user.full_name || user.username;
+      document.getElementById('staff-avatar').innerText = (user.full_name || user.username).charAt(0).toUpperCase();
+    }
+
+    function switchStaffTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.sidebar-nav .nav-link').forEach(el => el.classList.remove('active'));
+
+      const activeTab = document.getElementById(`tab-staff-${tabId}`);
+      if (activeTab) activeTab.style.display = 'block';
+
+      const links = document.querySelectorAll('.sidebar-nav .nav-link');
+      links.forEach(l => {
+        if (l.getAttribute('onclick') && l.getAttribute('onclick').includes(tabId)) {
+          l.classList.add('active');
+        }
+      });
+
+      const titles = {
+        'overview': 'Diagnostic Laboratory Overview',
+        'pending': 'Pending Laboratory Processing Queue',
+        'completed': 'Verified Diagnostic Reports',
+        'notifications': 'Laboratory Staff Notifications'
+      };
+      document.getElementById('staff-page-title').innerText = titles[tabId] || 'Staff Portal';
+
+      if (tabId === 'overview') loadStaffData();
+      else if (tabId === 'pending') loadPendingTests();
+      else if (tabId === 'completed') loadCompletedTests();
+      else if (tabId === 'notifications') loadStaffNotifications();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadStaffData();
+    });
+
+    async function loadStaffData() {
+      try {
+        const overview = await API.request('/staff/dashboard-overview');
+        document.getElementById('stat-staff-pending').innerText = overview.pending_tests_count;
+        document.getElementById('stat-staff-completed').innerText = overview.completed_tests_count;
+        document.getElementById('stat-staff-patients').innerText = overview.total_patients_count;
+
+        const tbody = document.getElementById('staff-pending-overview-tbody');
+        if (!overview.recent_requests.length) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">No pending laboratory tests in queue.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = overview.recent_requests.map(r => `
+          <tr>
+            <td><strong>#LAB-${r.test_id}</strong></td>
+            <td>${r.patient_id}</td>
+            <td><strong>${r.patient_name}</strong></td>
+            <td>${r.test_name}</td>
+            <td>${r.sample_type}</td>
+            <td>${new Date(r.test_date).toLocaleDateString()}</td>
+            <td><span class="badge badge-warning">${r.status}</span></td>
+            <td>
+              <button class="btn btn-primary btn-sm" onclick="openResultsModal(${r.test_id}, '${r.patient_name}', '${r.patient_id}')">
+                <i class="fa-solid fa-pen"></i> Enter Results
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function loadPendingTests() {
+      try {
+        const tests = await API.getLabTests('Requested');
+        const processing = await API.getLabTests('Processing');
+        const allPending = [...tests, ...processing];
+
+        const tbody = document.getElementById('staff-all-pending-tbody');
+        if (!allPending.length) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">No pending tests found.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = allPending.map(t => `
+          <tr>
+            <td>#LAB-${t.test_id}</td>
+            <td><strong>${t.patient_name || t.patient_id}</strong> (${t.patient_id})</td>
+            <td>${t.test_name}</td>
+            <td><span class="badge badge-warning">${t.status}</span></td>
+            <td>${new Date(t.test_date).toLocaleDateString()}</td>
+            <td>
+              <button class="btn btn-primary btn-sm" onclick="openResultsModal(${t.test_id}, '${t.patient_name}', '${t.patient_id}')">
+                <i class="fa-solid fa-pen"></i> Enter Results
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function loadCompletedTests() {
+      try {
+        const verified = await API.getLabTests('Verified');
+        const tbody = document.getElementById('staff-completed-tbody');
+        if (!verified.length) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No verified tests found.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = verified.map(t => `
+          <tr>
+            <td>#LAB-${t.test_id}</td>
+            <td><strong>${t.patient_name || t.patient_id}</strong></td>
+            <td>${t.test_name}</td>
+            <td>${t.staff_name || 'Staff'}</td>
+            <td><span class="badge badge-success">${t.status}</span></td>
+            <td>
+              ${t.results && t.results.length ? `
+                <div style="font-size:12px;">
+                  ${t.results.slice(0, 3).map(r => `
+                    <span>${r.parameter_name}: <strong>${r.test_value}</strong></span>
+                  `).join(' &bull; ')}
+                </div>
+              ` : '<span style="color:var(--text-dim);">-</span>'}
+            </td>
+            <td>
+              ${t.report_file_url ? `
+                <a href="${t.report_file_url}" target="_blank" class="btn btn-secondary btn-sm"><i class="fa-solid fa-file-pdf"></i> View</a>
+              ` : '<span style="color:var(--text-dim);">-</span>'}
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function openResultsModal(testId, patientName, patientId) {
+      document.getElementById('modal-test-id').value = testId;
+      document.getElementById('modal-patient-info').innerText = `Patient: ${patientName} (${patientId}) — Test #LAB-${testId}`;
+      document.getElementById('enter-results-modal').classList.add('active');
+    }
+
+    function closeResultsModal() {
+      document.getElementById('enter-results-modal').classList.remove('active');
+    }
+
+    async function submitLabResults(e) {
+      e.preventDefault();
+      const testId = document.getElementById('modal-test-id').value;
+
+      const sc = parseFloat(document.getElementById('res-sc').value);
+      const bu = parseFloat(document.getElementById('res-bu').value);
+      const sg = parseFloat(document.getElementById('res-sg').value);
+      const hemo = parseFloat(document.getElementById('res-hemo').value);
+      const sod = parseFloat(document.getElementById('res-sod').value);
+      const pot = parseFloat(document.getElementById('res-pot').value);
+      const comments = document.getElementById('res-comments').value;
+
+      const results = [
+        {
+          parameter_name: 'Serum Creatinine', parameter_code: 'SC', test_value: sc, unit: 'mg/dL',
+          reference_range: '0.6 - 1.2', abnormal_status: sc > 1.2 ? 'High' : (sc < 0.6 ? 'Low' : 'Normal')
+        },
+        {
+          parameter_name: 'Blood Urea Nitrogen', parameter_code: 'BU', test_value: bu, unit: 'mg/dL',
+          reference_range: '7 - 20', abnormal_status: bu > 20 ? 'High' : (bu < 7 ? 'Low' : 'Normal')
+        },
+        {
+          parameter_name: 'Urine Specific Gravity', parameter_code: 'SG', test_value: sg, unit: '',
+          reference_range: '1.015 - 1.025', abnormal_status: (sg < 1.015 || sg > 1.025) ? 'Abnormal' : 'Normal'
+        },
+        {
+          parameter_name: 'Hemoglobin', parameter_code: 'HEMO', test_value: hemo, unit: 'g/dL',
+          reference_range: '13.5 - 17.5', abnormal_status: hemo < 13.5 ? 'Low' : 'Normal'
+        },
+        {
+          parameter_name: 'Serum Sodium', parameter_code: 'SOD', test_value: sod, unit: 'mEq/L',
+          reference_range: '135 - 145', abnormal_status: (sod < 135 || sod > 145) ? 'Abnormal' : 'Normal'
+        },
+        {
+          parameter_name: 'Serum Potassium', parameter_code: 'POT', test_value: pot, unit: 'mEq/L',
+          reference_range: '3.5 - 5.0', abnormal_status: pot > 5.0 ? 'High' : (pot < 3.5 ? 'Low' : 'Normal')
+        }
+      ];
+
+      try {
+        // 1. Enter Results
+        await API.enterLabResults(testId, {
+          results,
+          comments,
+          status: 'Completed'
+        });
+
+        // 2. Upload file if selected
+        const fileInput = document.getElementById('res-file');
+        if (fileInput.files.length > 0) {
+          await API.uploadLabReportFile(testId, fileInput.files[0]);
+        }
+
+        // 3. Verify Test and Forward to Doctor
+        await API.verifyLabTest(testId);
+
+        showToast('Lab results recorded, verified, and forwarded to consulting doctor!', 'success');
+        closeResultsModal();
+        loadStaffData();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function loadStaffNotifications() {
+      try {
+        const notifs = await API.getNotifications();
+        const list = document.getElementById('staff-notifications-list');
+        const badge = document.getElementById('staff-notif-badge');
+
+        const unread = notifs.filter(n => !n.is_read);
+        badge.style.display = unread.length ? 'block' : 'none';
+
+        if (!notifs.length) {
+          list.innerHTML = `<p style="color:var(--text-muted);">No notifications.</p>`;
+          return;
+        }
+
+        list.innerHTML = notifs.map(n => `
+          <div style="background:${n.is_read ? '#FFFFFF' : 'var(--c-ice)'}; border:1px solid var(--c-ice-border); border-radius:var(--radius-sm); padding:14px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:700; font-size:14px; color:${n.is_read ? 'var(--c-dark)' : 'var(--c-primary)'};">${n.title}</div>
+              <div style="font-size:13px; color:var(--text-muted); margin-top:2px;">${n.message}</div>
+              <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">${new Date(n.created_at).toLocaleString()} &bull; Category: ${n.category}</div>
+            </div>
+            ${!n.is_read ? `
+              <button class="btn btn-secondary btn-sm" onclick="markStaffRead(${n.notification_id})">Mark Read</button>
+            ` : ''}
+          </div>
+        `).join('');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function markStaffRead(id) {
+      await API.markNotificationRead(id);
+      loadStaffNotifications();
+    }
+
+    async function markAllStaffRead() {
+      await API.markAllNotificationsRead();
+      showToast('All notifications marked as read', 'success');
+      loadStaffNotifications();
+    }
+  </script>
+</body>
+</html>

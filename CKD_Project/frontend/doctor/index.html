@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Portal - CKD SmartCare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css?v=6">
+  <style>
+    body, .app-container, .app-main, .content-wrapper {
+      background-color: #F8FAFC !important;
+      color: #111827 !important;
+    }
+    .app-sidebar, .top-navbar {
+      background: #FFFFFF !important;
+      border-color: #D9E6F2 !important;
+    }
+    .brand-logo {
+      background: transparent !important;
+      border-radius: 10px;
+    }
+    .brand-text h2, .navbar-title h1, .card-title, h1, h2, h3, h4 {
+      color: #111827 !important;
+    }
+    .card, .stat-card {
+      background: #FFFFFF !important;
+      border: 1px solid #D9E6F2 !important;
+      box-shadow: 0 2px 8px rgba(17, 24, 39, 0.04) !important;
+    }
+    .stat-details h3 {
+      color: #111827 !important;
+    }
+    .stat-details p {
+      color: #4B5563 !important;
+    }
+    .stat-icon {
+      background: #D9E6F2 !important;
+      color: #2F80ED !important;
+    }
+    .form-control {
+      background: #FFFFFF !important;
+      border: 1px solid #C8DBEC !important;
+      color: #111827 !important;
+    }
+    .custom-table th {
+      background: #D9E6F2 !important;
+      color: #111827 !important;
+    }
+    .custom-table td {
+      color: #111827 !important;
+      border-bottom: 1px solid #D9E6F2 !important;
+    }
+    .btn-secondary {
+      background: #D9E6F2 !important;
+      border: 1px solid #C8DBEC !important;
+      color: #111827 !important;
+    }
+    .btn-primary {
+      background: #2F80ED !important;
+      color: #FFFFFF !important;
+    }
+    .nav-link {
+      color: #4B5563 !important;
+    }
+    .nav-link:hover {
+      background: #D9E6F2 !important;
+      color: #111827 !important;
+    }
+    .nav-link.active {
+      background: #2F80ED !important;
+      color: #FFFFFF !important;
+    }
+    .user-badge {
+      background: #D9E6F2 !important;
+      border: 1px solid #C8DBEC !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo" style="overflow:hidden; padding:0; background:transparent; border-radius:10px;">
+          <img src="/assets/kidney_logo.png?v=6" alt="CKD Logo" style="width:100%; height:100%; object-fit:contain; border-radius:10px; display:block;">
+        </div>
+        <div class="brand-text">
+          <h2>CKD SmartCare</h2>
+          <p>Doctor Workspace</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-link active" onclick="switchDocTab('overview')">
+          <i class="fa-solid fa-chart-line"></i> Overview
+        </div>
+        <div class="nav-link" onclick="switchDocTab('patients')">
+          <i class="fa-solid fa-hospital-user"></i> Patient Search & 360
+        </div>
+        <div class="nav-link" onclick="switchDocTab('appointments')">
+          <i class="fa-solid fa-calendar-check"></i> Consultations
+        </div>
+        <div class="nav-link" onclick="switchDocTab('predictions')">
+          <i class="fa-solid fa-brain"></i> CKD ML Prediction
+        </div>
+        <div class="nav-link" onclick="switchDocTab('notifications')">
+          <i class="fa-solid fa-bell"></i> Notifications
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-badge" style="margin-bottom: 12px;">
+          <div class="user-avatar" id="doc-avatar" style="background: var(--c-primary); color: #FFFFFF;">D</div>
+          <div class="user-info">
+            <div class="user-name" id="doc-name">Dr. Sarah Jenkins</div>
+            <div class="user-role" id="doc-dept">Chief Nephrologist</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="API.clearAuth()">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <header class="top-navbar">
+        <div class="navbar-title">
+          <h1 id="doc-page-title">Doctor Clinical Dashboard</h1>
+        </div>
+        <div class="navbar-actions">
+          <button class="notif-bell-btn" onclick="switchDocTab('notifications')">
+            <i class="fa-regular fa-bell"></i>
+            <span class="notif-badge" id="doc-notif-badge" style="display:none;"></span>
+          </button>
+        </div>
+      </header>
+
+      <div class="content-wrapper">
+        <!-- Medical Disclaimer Banner -->
+        <div class="medical-alert">
+          <i class="fa-solid fa-shield-halved"></i>
+          <div>
+            <strong>Nephrology Clinical Decision Support System:</strong> Machine learning inferences (XGBoost / LightGBM) and SHAP risk factor rankings are provided to assist in diagnostic risk stratification. Qualified clinical judgment remains authoritative.
+          </div>
+        </div>
+
+        <!-- 1. OVERVIEW TAB -->
+        <div id="tab-doc-overview" class="tab-content">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-calendar-day"></i></div>
+              <div class="stat-details">
+                <h3 id="stat-doc-today">0</h3>
+                <p>Today's Appointments</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+              <div class="stat-details">
+                <h3 id="stat-doc-patients">0</h3>
+                <p>Assigned Patients</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-microscope"></i></div>
+              <div class="stat-details">
+                <h3 id="stat-doc-pending-labs">0</h3>
+                <p>Verified Lab Reports</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-brain"></i></div>
+              <div class="stat-details">
+                <h3 id="stat-doc-preds">0</h3>
+                <p>ML Predictions Run</p>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <!-- Upcoming Consultations Card -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-calendar-days"></i> Upcoming Consultations</div>
+              </div>
+              <div class="table-responsive">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Patient</th>
+                      <th>Time</th>
+                      <th>Reason</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="doc-upcoming-tbody">
+                    <tr><td colspan="4" style="text-align:center;">Loading appointments...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Recent Predictions Card -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-brain"></i> Recent Risk Inferences</div>
+              </div>
+              <div class="table-responsive">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Patient</th>
+                      <th>Risk Result</th>
+                      <th>Probability</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="doc-recent-preds-tbody">
+                    <tr><td colspan="4" style="text-align:center;">Loading predictions...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. PATIENT SEARCH & 360-DEGREE VIEW TAB -->
+        <div id="tab-doc-patients" class="tab-content" style="display:none;">
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-magnifying-glass"></i> Patient Search & Directory</div>
+            </div>
+            <div style="display:flex; gap:12px;">
+              <input type="text" id="patient-search-input" class="form-control" placeholder="Search by Patient ID, Name, Phone, or Email..." onkeyup="handlePatientSearch()">
+              <button class="btn btn-primary" onclick="handlePatientSearch()"><i class="fa-solid fa-search"></i> Search</button>
+            </div>
+            <div id="patient-search-results" style="margin-top: 16px;"></div>
+          </div>
+
+          <!-- Patient 360 View Container -->
+          <div id="patient-360-container" style="display:none;">
+            <!-- Demographics Header -->
+            <div class="card" style="border-left: 4px solid var(--c-cyan-100);">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
+                <div>
+                  <h2 id="p360-name" style="font-size:22px; font-weight:800;">Johnathan Miller</h2>
+                  <p id="p360-sub" style="font-size:13px; color:var(--text-muted);">PAT-001 &bull; Male &bull; 58 Years &bull; Blood Group: O+</p>
+                  <p id="p360-contact" style="font-size:12px; color:var(--text-dim); margin-top:4px;">Phone: +1 555-678-1234 &bull; Address: 742 Evergreen Terrace</p>
+                </div>
+                <div style="display:flex; gap:10px;">
+                  <button class="btn btn-primary btn-sm" onclick="openPredictModal()"><i class="fa-solid fa-bolt"></i> Run CKD Prediction</button>
+                  <button class="btn btn-secondary btn-sm" onclick="openNotesModal()"><i class="fa-solid fa-pen-to-square"></i> Add Clinical Notes</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 360 Grid: Assessment + Lab Reports -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:20px;">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fa-solid fa-file-waveform"></i> Latest Clinical Assessment</div>
+                </div>
+                <div id="p360-assessment-content">
+                  <p style="color:var(--text-muted);">No assessment submitted.</p>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fa-solid fa-flask-vial"></i> Laboratory Test Results</div>
+                </div>
+                <div id="p360-lab-content">
+                  <p style="color:var(--text-muted);">No lab records on file.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Prediction History + Clinical Notes -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fa-solid fa-brain"></i> ML Prediction Evaluations</div>
+                </div>
+                <div id="p360-prediction-content">
+                  <p style="color:var(--text-muted);">No predictions run yet.</p>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fa-solid fa-notes-medical"></i> Doctor Consultation Notes</div>
+                </div>
+                <div id="p360-notes-content">
+                  <p style="color:var(--text-muted);">No notes recorded.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. CONSULTATIONS / APPOINTMENTS TAB -->
+        <div id="tab-doc-appointments" class="tab-content" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-calendar-check"></i> Consultation Schedule</div>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Patient Name</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="doc-all-appointments-tbody">
+                  <tr><td colspan="7" style="text-align:center;">Loading appointments...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. ML PREDICTION RUNNER TAB -->
+        <div id="tab-doc-predictions" class="tab-content" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-brain"></i> CKD Risk Prediction & Model Evaluation Engine</div>
+            </div>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">
+              Select an assigned patient to auto-load their latest clinical and laboratory features, choose the ML algorithm (XGBoost / LightGBM), and generate real-time SHAP explainability.
+            </p>
+            <div class="form-grid" style="margin-bottom:24px;">
+              <div class="form-group">
+                <label class="form-label">Select Patient <span class="req">*</span></label>
+                <select id="pred-patient-select" class="form-control" onchange="loadPatientForPrediction()">
+                  <option value="">-- Choose Registered Patient --</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Model Algorithm</label>
+                <select id="pred-model-select" class="form-control">
+                  <option value="XGBoost">XGBoost Classifier (Selected Production Model)</option>
+                  <option value="LightGBM">LightGBM Classifier</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Patient Quick Preview -->
+            <div id="pred-patient-preview" style="display:none; margin-bottom:20px;"></div>
+
+            <button class="btn btn-primary" id="run-pred-btn" onclick="executePredictionFromForm()">
+              <i class="fa-solid fa-bolt"></i> Execute Machine Learning Prediction
+            </button>
+
+            <!-- Result Box -->
+            <div id="ml-result-display" style="display:none; margin-top:28px;"></div>
+          </div>
+        </div>
+
+        <!-- 5. NOTIFICATIONS TAB -->
+        <div id="tab-doc-notifications" class="tab-content" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-bell"></i> Clinical Alerts & Notifications</div>
+              <button class="btn btn-secondary btn-sm" onclick="markAllDocRead()"><i class="fa-solid fa-check-double"></i> Mark All Read</button>
+            </div>
+            <div id="doc-notifications-list">
+              <p style="color: var(--text-muted);">Loading notifications...</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Clinical Notes Modal -->
+  <div class="modal-overlay" id="notes-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="font-size:18px; font-weight:700;"><i class="fa-solid fa-notes-medical" style="color:var(--c-cyan-100);"></i> Add Clinical Consultation Notes</h3>
+        <button class="modal-close-btn" onclick="closeNotesModal()"><i class="fa-solid fa-times"></i></button>
+      </div>
+      <form id="notes-form" onsubmit="submitClinicalNotes(event)">
+        <input type="hidden" id="note-patient-id">
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label">Clinical Diagnosis <span class="req">*</span></label>
+          <input type="text" id="note-diagnosis" class="form-control" placeholder="e.g. Stage 3 Chronic Kidney Disease with Secondary Hypertension" required>
+        </div>
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label">Clinical Summary & Observations <span class="req">*</span></label>
+          <textarea id="note-summary" class="form-control" rows="3" placeholder="Summary of patient symptoms, renal markers, and risk factors..." required></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label">Treatment Plan & Dietary Regimen <span class="req">*</span></label>
+          <textarea id="note-plan" class="form-control" rows="3" placeholder="1. Low sodium & protein regimen&#10;2. Blood pressure control&#10;3. Follow-up testing" required></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label">Prescriptions & Dosage</label>
+          <input type="text" id="note-prescriptions" class="form-control" placeholder="e.g. Losartan 50mg OD, Torsemide 10mg OD">
+        </div>
+        <div class="form-group" style="margin-bottom:20px;">
+          <label class="form-label">Next Follow-up Date</label>
+          <input type="date" id="note-followup" class="form-control">
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <button type="button" class="btn btn-secondary" onclick="closeNotesModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Save Clinical Notes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    if (!checkAuthRole('DOCTOR')) {}
+
+    const user = API.getUser();
+    if (user) {
+      document.getElementById('doc-name').innerText = user.full_name || user.username;
+      document.getElementById('doc-avatar').innerText = (user.full_name || user.username).charAt(0).toUpperCase();
+    }
+
+    let activePatient360Id = null;
+
+    function switchDocTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.sidebar-nav .nav-link').forEach(el => el.classList.remove('active'));
+
+      const activeTab = document.getElementById(`tab-doc-${tabId}`);
+      if (activeTab) activeTab.style.display = 'block';
+
+      const links = document.querySelectorAll('.sidebar-nav .nav-link');
+      links.forEach(l => {
+        if (l.getAttribute('onclick') && l.getAttribute('onclick').includes(tabId)) {
+          l.classList.add('active');
+        }
+      });
+
+      const titles = {
+        'overview': 'Doctor Clinical Dashboard',
+        'patients': 'Patient Search & 360 Overview',
+        'appointments': 'Consultation Management',
+        'predictions': 'Machine Learning Risk Prediction',
+        'notifications': 'Clinical Notifications'
+      };
+      document.getElementById('doc-page-title').innerText = titles[tabId] || 'Doctor Portal';
+
+      if (tabId === 'overview') loadDocOverview();
+      else if (tabId === 'patients') handlePatientSearch();
+      else if (tabId === 'appointments') loadDocAppointments();
+      else if (tabId === 'predictions') populatePredictionPatientSelect();
+      else if (tabId === 'notifications') loadDocNotifications();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadDocOverview();
+      handlePatientSearch();
+      populatePredictionPatientSelect();
+    });
+
+    async function loadDocOverview() {
+      try {
+        const data = await API.getDoctorOverview();
+        document.getElementById('stat-doc-today').innerText = data.today_appointments_count;
+        document.getElementById('stat-doc-patients').innerText = data.total_patients_count;
+        document.getElementById('stat-doc-pending-labs').innerText = data.pending_reviews_count;
+        document.getElementById('stat-doc-preds').innerText = data.total_predictions_count;
+
+        // Upcoming consultations table
+        const upTbody = document.getElementById('doc-upcoming-tbody');
+        if (!data.upcoming_appointments.length) {
+          upTbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No upcoming appointments today.</td></tr>`;
+        } else {
+          upTbody.innerHTML = data.upcoming_appointments.map(a => `
+            <tr>
+              <td><strong>${a.patient_name}</strong></td>
+              <td>${a.time}</td>
+              <td>${a.reason}</td>
+              <td><button class="btn btn-primary btn-sm" onclick="openPatient360('${a.patient_id}')">Open 360</button></td>
+            </tr>
+          `).join('');
+        }
+
+        // Recent predictions table
+        const predTbody = document.getElementById('doc-recent-preds-tbody');
+        if (!data.recent_predictions.length) {
+          predTbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No predictions recorded.</td></tr>`;
+        } else {
+          predTbody.innerHTML = data.recent_predictions.map(p => `
+            <tr>
+              <td><strong>${p.patient_name}</strong></td>
+              <td><span class="badge ${p.result === 'CKD Detected' ? 'badge-danger' : 'badge-success'}">${p.result}</span></td>
+              <td>${(p.probability * 100).toFixed(1)}%</td>
+              <td>${new Date(p.date).toLocaleDateString()}</td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function handlePatientSearch() {
+      const q = document.getElementById('patient-search-input').value.trim();
+      try {
+        const patients = await API.searchPatients(q);
+        const resultsBox = document.getElementById('patient-search-results');
+        if (!patients.length) {
+          resultsBox.innerHTML = `<p style="color:var(--text-muted);">No patients found.</p>`;
+          return;
+        }
+
+        resultsBox.innerHTML = `
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Patient ID</th>
+                  <th>Full Name</th>
+                  <th>DOB</th>
+                  <th>Gender</th>
+                  <th>Blood Group</th>
+                  <th>Phone</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${patients.map(p => `
+                  <tr>
+                    <td><strong>${p.patient_id}</strong></td>
+                    <td>${p.full_name}</td>
+                    <td>${p.date_of_birth}</td>
+                    <td>${p.gender}</td>
+                    <td><span class="badge badge-purple">${p.blood_group}</span></td>
+                    <td>${p.phone}</td>
+                    <td>
+                      <button class="btn btn-primary btn-sm" onclick="openPatient360('${p.patient_id}')">
+                        <i class="fa-solid fa-eye"></i> View 360
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function openPatient360(patientId) {
+      activePatient360Id = patientId;
+      document.getElementById('patient-360-container').style.display = 'block';
+      window.scrollTo({ top: document.getElementById('patient-360-container').offsetTop - 80, behavior: 'smooth' });
+
+      try {
+        const p360 = await API.getPatient360(patientId);
+
+        // Header info
+        document.getElementById('p360-name').innerText = p360.patient.full_name;
+        document.getElementById('p360-sub').innerText = `${p360.patient.patient_id} • ${p360.patient.gender} • DOB: ${p360.patient.date_of_birth} • Blood Group: ${p360.patient.blood_group}`;
+        document.getElementById('p360-contact').innerText = `Phone: ${p360.patient.phone} • Email: ${p360.patient.email} • Emergency: ${p360.patient.emergency_contact}`;
+
+        // Assessment
+        const assBox = document.getElementById('p360-assessment-content');
+        if (p360.latest_assessment) {
+          const a = p360.latest_assessment;
+          assBox.innerHTML = `
+            <div style="font-size:13px; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div><strong>Blood Pressure:</strong> ${a.bp || '-'} mm/Hg</div>
+              <div><strong>Specific Gravity:</strong> ${a.sg || '-'}</div>
+              <div><strong>Albumin:</strong> ${a.al !== null ? a.al : '-'}</div>
+              <div><strong>Sugar:</strong> ${a.su !== null ? a.su : '-'}</div>
+              <div><strong>Blood Glucose (BGR):</strong> ${a.bgr || '-'} mg/dL</div>
+              <div><strong>Blood Urea (BU):</strong> ${a.bu || '-'} mg/dL</div>
+              <div><strong>Serum Creatinine:</strong> ${a.sc || '-'} mg/dL</div>
+              <div><strong>Hemoglobin:</strong> ${a.hemo || '-'} g/dL</div>
+              <div><strong>Hypertension:</strong> ${a.htn || '-'}</div>
+              <div><strong>Diabetes:</strong> ${a.dm || '-'}</div>
+              <div><strong>Pedal Edema:</strong> ${a.pe || '-'}</div>
+              <div><strong>Anemia:</strong> ${a.ane || '-'}</div>
+            </div>
+            ${a.notes ? `<p style="margin-top:10px; font-size:12px; color:var(--text-muted);"><strong>Notes:</strong> ${a.notes}</p>` : ''}
+          `;
+        } else {
+          assBox.innerHTML = `<p style="color:var(--text-muted);">No medical assessment recorded for this patient.</p>`;
+        }
+
+        // Lab tests
+        const labBox = document.getElementById('p360-lab-content');
+        if (p360.lab_tests.length) {
+          labBox.innerHTML = p360.lab_tests.map(lt => `
+            <div style="margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border-subtle);">
+              <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700;">
+                <span>${lt.test_name}</span>
+                <span class="badge ${lt.status === 'Verified' ? 'badge-success' : 'badge-warning'}">${lt.status}</span>
+              </div>
+              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Date: ${new Date(lt.test_date).toLocaleDateString()}</div>
+              ${lt.results && lt.results.length ? `
+                <div style="font-size:12px; margin-top:6px;">
+                  ${lt.results.map(r => `
+                    <span style="display:inline-block; margin-right:12px;">${r.parameter_name}: <strong>${r.test_value} ${r.unit}</strong> <span class="badge ${r.abnormal_status === 'Normal' ? 'badge-success' : 'badge-danger'}" style="font-size:10px;">${r.abnormal_status}</span></span>
+                  `).join('')}
+                </div>
+              ` : '<p style="font-size:12px; color:var(--text-dim);">No parameters entered.</p>'}
+              ${lt.report_file_url ? `<div style="margin-top:4px;"><a href="${lt.report_file_url}" target="_blank" class="btn btn-secondary btn-sm" style="font-size:11px;"><i class="fa-solid fa-file-pdf"></i> View Uploaded Report</a></div>` : ''}
+            </div>
+          `).join('');
+        } else {
+          labBox.innerHTML = `<p style="color:var(--text-muted);">No laboratory tests found.</p>`;
+        }
+
+        // Predictions
+        const predBox = document.getElementById('p360-prediction-content');
+        if (p360.predictions.length) {
+          predBox.innerHTML = p360.predictions.map(p => `
+            <div style="padding:12px; background:rgba(255,255,255,0.02); border-radius:var(--radius-sm); margin-bottom:10px;">
+              <div style="display:flex; justify-content:space-between;">
+                <strong>${p.result}</strong>
+                <span class="badge ${p.result === 'CKD Detected' ? 'badge-danger' : 'badge-success'}">${(p.probability * 100).toFixed(1)}% (${p.risk_level})</span>
+              </div>
+              <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">Model: ${p.model_name} v${p.model_version} &bull; ${new Date(p.date).toLocaleString()}</div>
+            </div>
+          `).join('');
+        } else {
+          predBox.innerHTML = `<p style="color:var(--text-muted);">No ML predictions generated yet.</p>`;
+        }
+
+        // Notes
+        const notesBox = document.getElementById('p360-notes-content');
+        if (p360.clinical_notes.length) {
+          notesBox.innerHTML = p360.clinical_notes.map(n => `
+            <div style="padding:14px; background:var(--c-ice); border-radius:var(--radius-sm); margin-bottom:10px; border-left:4px solid var(--c-primary);">
+              <p style="font-size:13px; font-weight:700; color:var(--c-dark);">Diagnosis: ${n.diagnosis}</p>
+              <p style="font-size:12px; color:var(--text-muted); margin-top:4px;"><strong>Plan:</strong> ${n.treatment_plan}</p>
+              ${n.prescriptions ? `<p style="font-size:12px; color:var(--c-primary); font-weight:600; margin-top:4px;"><strong>Rx:</strong> ${n.prescriptions}</p>` : ''}
+              <p style="font-size:11px; color:var(--text-dim); margin-top:4px;">Recorded by ${n.doctor_name} on ${new Date(n.created_at).toLocaleDateString()}</p>
+            </div>
+          `).join('');
+        } else {
+          notesBox.innerHTML = `<p style="color:var(--text-muted);">No doctor consultation notes yet.</p>`;
+        }
+
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function openNotesModal() {
+      if (!activePatient360Id) {
+        showToast('Please select a patient first', 'error');
+        return;
+      }
+      document.getElementById('note-patient-id').value = activePatient360Id;
+      document.getElementById('notes-modal').classList.add('active');
+    }
+
+    function closeNotesModal() {
+      document.getElementById('notes-modal').classList.remove('active');
+    }
+
+    async function submitClinicalNotes(e) {
+      e.preventDefault();
+      try {
+        await API.addClinicalNotes({
+          patient_id: document.getElementById('note-patient-id').value,
+          diagnosis: document.getElementById('note-diagnosis').value,
+          clinical_summary: document.getElementById('note-summary').value,
+          treatment_plan: document.getElementById('note-plan').value,
+          prescriptions: document.getElementById('note-prescriptions').value,
+          follow_up_date: document.getElementById('note-followup').value || null
+        });
+        showToast('Clinical notes and recommendations saved successfully!', 'success');
+        closeNotesModal();
+        openPatient360(activePatient360Id);
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function openPredictModal(patientId = null) {
+      const targetId = patientId || activePatient360Id;
+      switchDocTab('predictions');
+      await populatePredictionPatientSelect(targetId);
+    }
+
+    async function populatePredictionPatientSelect(selectedId = null) {
+      const select = document.getElementById('pred-patient-select');
+      if (!select) return;
+      const currentVal = selectedId || select.value;
+      try {
+        const patients = await API.searchPatients('');
+        if (!patients || !patients.length) {
+          select.innerHTML = '<option value="">-- No registered patients found --</option>';
+          return;
+        }
+        select.innerHTML = '<option value="">-- Choose Registered Patient (' + patients.length + ' Available) --</option>' +
+          patients.map(p => `<option value="${p.patient_id}">${p.full_name} (${p.patient_id}) - ${p.gender}, Blood: ${p.blood_group}</option>`).join('');
+        
+        if (currentVal) {
+          select.value = currentVal;
+        }
+        loadPatientForPrediction();
+      } catch (err) {
+        console.error('Failed to populate prediction patients dropdown:', err);
+      }
+    }
+
+    async function loadPatientForPrediction() {
+      const patientId = document.getElementById('pred-patient-select').value;
+      const previewBox = document.getElementById('pred-patient-preview');
+      if (!previewBox) return;
+
+      if (!patientId) {
+        previewBox.style.display = 'none';
+        return;
+      }
+
+      previewBox.style.display = 'block';
+      previewBox.innerHTML = '<div style="font-size:12px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Auto-loading patient clinical features...</div>';
+
+      try {
+        const p360 = await API.getPatient360(patientId);
+        const p = p360.patient;
+        const a = p360.latest_assessment;
+        const labsCount = p360.lab_tests ? p360.lab_tests.length : 0;
+        const predsCount = p360.predictions ? p360.predictions.length : 0;
+
+        previewBox.innerHTML = `
+          <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:var(--radius-sm); padding:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div>
+                <strong style="font-size:14px; color:var(--c-cyan-100);">${p.full_name}</strong>
+                <span style="font-size:12px; color:var(--text-muted); margin-left:6px;">(${p.patient_id}) &bull; ${p.gender}, DOB: ${p.date_of_birth} &bull; Blood: <span class="badge badge-purple">${p.blood_group}</span></span>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <span class="badge ${labsCount > 0 ? 'badge-success' : 'badge-warning'}" style="font-size:11px;">${labsCount} Lab Reports</span>
+                <span class="badge badge-purple" style="font-size:11px;">${predsCount} Predictions</span>
+              </div>
+            </div>
+            ${a ? `
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:8px; font-size:11px; margin-top:8px; padding-top:8px; border-top:1px solid var(--border-subtle); color:var(--text-muted);">
+                <div>Blood Pressure: <strong style="color:var(--text-main);">${a.bp || '120/80'}</strong></div>
+                <div>Serum Creatinine: <strong style="color:var(--text-main);">${a.sc || 'N/A'}</strong> mg/dL</div>
+                <div>Hemoglobin: <strong style="color:var(--text-main);">${a.hemo || 'N/A'}</strong> g/dL</div>
+                <div>Blood Glucose: <strong style="color:var(--text-main);">${a.bgr || 'N/A'}</strong> mg/dL</div>
+                <div>Albumin (al): <strong style="color:var(--text-main);">${a.al !== null ? a.al : '0'}</strong></div>
+                <div>Specific Gravity: <strong style="color:var(--text-main);">${a.sg || '1.020'}</strong></div>
+              </div>
+            ` : `
+              <p style="font-size:11px; color:var(--text-dim); margin-top:4px;">
+                <i class="fa-solid fa-circle-info" style="color:var(--c-cyan-100);"></i> Standard clinical baseline features and laboratory records will be utilized for this prediction inference.
+              </p>
+            `}
+          </div>
+        `;
+      } catch (err) {
+        previewBox.innerHTML = `<div style="font-size:12px; color:var(--text-muted);">Patient selected (${patientId}). Ready to execute prediction.</div>`;
+      }
+    }
+
+    async function executePredictionFromForm() {
+      const patientId = document.getElementById('pred-patient-select').value;
+      const modelChoice = document.getElementById('pred-model-select').value;
+      const btn = document.getElementById('run-pred-btn');
+
+      if (!patientId) {
+        showToast('Please select a patient', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Preprocessing Features & Running Inference...';
+
+      try {
+        const pred = await API.runPrediction({
+          patient_id: patientId,
+          model_choice: modelChoice
+        });
+
+        const resBox = document.getElementById('ml-result-display');
+        resBox.style.display = 'block';
+
+        const isRisk = pred.prediction_result === 'CKD Detected';
+        resBox.innerHTML = `
+          <div style="background:#FFFFFF; border:1px solid var(--c-ice); border-radius:var(--radius-md); padding:24px; box-shadow:var(--shadow-sm);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <div>
+                <h3 style="font-size:20px; font-weight:800; color:var(--c-dark);">CKD Risk Prediction: <span style="color:${isRisk ? '#EF4444' : '#10B981'};">${pred.prediction_result}</span></h3>
+                <p style="font-size:13px; color:var(--text-muted);">Model: <strong>${pred.model_name} (v${pred.model_version})</strong> &bull; Evaluation Confidence: <strong>${(pred.probability * 100).toFixed(2)}%</strong></p>
+              </div>
+              <span class="badge ${isRisk ? 'badge-danger' : 'badge-success'}" style="font-size:16px; padding:8px 18px;">${pred.risk_level}</span>
+            </div>
+
+            <h4 style="font-size:14px; font-weight:800; color:var(--c-primary); margin:18px 0 10px 0; text-transform:uppercase;">
+              Explainable AI: Key Contributing Biomarkers (SHAP TreeExplainer)
+            </h4>
+            <div class="shap-bar-container">
+              ${pred.top_factors ? pred.top_factors.map(f => `
+                <div class="shap-row">
+                  <div class="shap-header">
+                    <span><strong>${f.friendly_name}</strong> (${f.feature})</span>
+                    <span style="color:${f.shap_value > 0 ? '#EF4444' : '#10B981'}; font-weight:700;">${f.risk_impact} [SHAP: ${f.shap_value > 0 ? '+' : ''}${f.shap_value}]</span>
+                  </div>
+                  <div class="shap-track">
+                    <div class="${f.shap_value > 0 ? 'shap-fill-risk' : 'shap-fill-safe'}" style="width:${Math.min(Math.abs(f.shap_value) * 50, 100)}%;"></div>
+                  </div>
+                </div>
+              `).join('') : '<p>Features computed</p>'}
+            </div>
+
+            <div style="margin-top:20px; padding:12px; background:var(--c-ice); border:1px solid var(--c-ice-border); border-radius:var(--radius-sm); font-size:12px; color:var(--text-muted);">
+              <i class="fa-solid fa-circle-info" style="color:var(--c-primary);"></i> ${pred.clinical_disclaimer}
+            </div>
+          </div>
+        `;
+        showToast('Prediction successfully generated and logged in database!', 'success');
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Execute Machine Learning Prediction';
+      }
+    }
+
+    async function loadDocAppointments() {
+      try {
+        const apps = await API.getAppointments();
+        const tbody = document.getElementById('doc-all-appointments-tbody');
+        if (!apps.length) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No consultations found.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = apps.map(a => `
+          <tr>
+            <td>#APP-${a.appointment_id}</td>
+            <td><strong>${a.patient_name || a.patient_id}</strong></td>
+            <td>${a.preferred_date}</td>
+            <td>${a.preferred_time}</td>
+            <td>${a.reason_for_visit}</td>
+            <td><span class="badge ${a.status === 'Confirmed' ? 'badge-success' : (a.status === 'Completed' ? 'badge-purple' : 'badge-warning')}">${a.status}</span></td>
+            <td>
+              <button class="btn btn-primary btn-sm" onclick="openPatient360('${a.patient_id}'); switchDocTab('patients');">Open 360</button>
+              ${a.status === 'Requested' ? `
+                <button class="btn btn-success btn-sm" onclick="setAppStatus(${a.appointment_id}, 'Confirmed')">Confirm</button>
+              ` : ''}
+              ${a.status === 'Confirmed' ? `
+                <button class="btn btn-secondary btn-sm" onclick="setAppStatus(${a.appointment_id}, 'Completed')">Complete</button>
+              ` : ''}
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function setAppStatus(id, newStatus) {
+      try {
+        await API.updateAppointmentStatus(id, { status: newStatus });
+        showToast(`Appointment status updated to ${newStatus}`, 'success');
+        loadDocAppointments();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function loadDocNotifications() {
+      try {
+        const notifs = await API.getNotifications();
+        const list = document.getElementById('doc-notifications-list');
+        const badge = document.getElementById('doc-notif-badge');
+
+        const unread = notifs.filter(n => !n.is_read);
+        badge.style.display = unread.length ? 'block' : 'none';
+
+        if (!notifs.length) {
+          list.innerHTML = `<p style="color:var(--text-muted);">No clinical notifications.</p>`;
+          return;
+        }
+
+        list.innerHTML = notifs.map(n => `
+          <div style="background:${n.is_read ? '#FFFFFF' : 'var(--c-ice)'}; border:1px solid var(--c-ice-border); border-radius:var(--radius-sm); padding:14px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:700; font-size:14px; color:${n.is_read ? 'var(--c-dark)' : 'var(--c-primary)'};">${n.title}</div>
+              <div style="font-size:13px; color:var(--text-muted); margin-top:2px;">${n.message}</div>
+              <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">${new Date(n.created_at).toLocaleString()} &bull; Category: ${n.category}</div>
+            </div>
+            ${!n.is_read ? `
+              <button class="btn btn-secondary btn-sm" onclick="markDocRead(${n.notification_id})">Mark Read</button>
+            ` : ''}
+          </div>
+        `).join('');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function markDocRead(id) {
+      await API.markNotificationRead(id);
+      loadDocNotifications();
+    }
+
+    async function markAllDocRead() {
+      await API.markAllNotificationsRead();
+      showToast('All notifications marked as read', 'success');
+      loadDocNotifications();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Registration - CKD Healthcare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css?v=6">
+</head>
+<body>
+
+  <div style="max-width: 800px; margin: 40px auto; padding: 20px;">
+    <div class="card" style="padding: 36px;">
+      <!-- Header -->
+      <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; border-bottom: 1px solid var(--c-ice); padding-bottom: 16px;">
+        <div class="brand-logo" style="overflow:hidden; padding:0; background:transparent; border-radius:12px;">
+          <img src="/assets/kidney_logo.png?v=6" alt="CKD Logo" style="width:100%; height:100%; object-fit:contain; border-radius:12px; display:block;">
+        </div>
+        <div>
+          <h2 style="font-size: 22px; font-weight: 800; color: var(--c-dark);">
+            Patient Portal Registration
+          </h2>
+          <p style="font-size: 13px; color: var(--text-muted);">
+            Create your patient account to access kidney health assessments, laboratory records & appointments
+          </p>
+        </div>
+      </div>
+
+      <!-- Registration Form -->
+      <form id="reg-form" onsubmit="handleRegistration(event)">
+        <h3 style="font-size: 14px; font-weight: 800; color: var(--c-primary); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px;">
+          1. Account Credentials
+        </h3>
+        <div class="form-grid" style="margin-bottom: 24px;">
+          <div class="form-group">
+            <label class="form-label">Username <span class="req">*</span></label>
+            <input type="text" id="username" class="form-control" placeholder="e.g. jmiller" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address <span class="req">*</span></label>
+            <input type="email" id="email" class="form-control" placeholder="e.g. john@example.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password <span class="req">*</span></label>
+            <input type="password" id="password" class="form-control" placeholder="Minimum 6 characters" minlength="6" required>
+          </div>
+        </div>
+
+        <h3 style="font-size: 14px; font-weight: 800; color: var(--c-primary); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px;">
+          2. Personal & Clinical Profile
+        </h3>
+        <div class="form-grid" style="margin-bottom: 24px;">
+          <div class="form-group">
+            <label class="form-label">Full Name <span class="req">*</span></label>
+            <input type="text" id="full_name" class="form-control" placeholder="e.g. Johnathan Miller" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date of Birth <span class="req">*</span></label>
+            <input type="date" id="date_of_birth" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gender <span class="req">*</span></label>
+            <select id="gender" class="form-control" required>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Blood Group <span class="req">*</span></label>
+            <select id="blood_group" class="form-control" required>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number <span class="req">*</span></label>
+            <input type="tel" id="phone" class="form-control" placeholder="+1 (555) 000-0000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Emergency Contact <span class="req">*</span></label>
+            <input type="text" id="emergency_contact" class="form-control" placeholder="Name & Phone (e.g. Mary - 555-1234)" required>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 28px;">
+          <label class="form-label">Residential Address <span class="req">*</span></label>
+          <textarea id="address" class="form-control" rows="2" placeholder="Street, City, State, ZIP" required></textarea>
+        </div>
+
+        <div style="display: flex; gap: 14px; align-items: center; justify-content: flex-end;">
+          <a href="/login.html" class="btn btn-secondary">Already Registered? Log In</a>
+          <button type="submit" id="submit-btn" class="btn btn-primary" style="padding: 12px 28px;">
+            <i class="fa-solid fa-user-check"></i> Complete Registration
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    async function handleRegistration(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submit-btn');
+
+      const payload = {
+        username: document.getElementById('username').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value,
+        full_name: document.getElementById('full_name').value.trim(),
+        date_of_birth: document.getElementById('date_of_birth').value,
+        gender: document.getElementById('gender').value,
+        blood_group: document.getElementById('blood_group').value,
+        phone: document.getElementById('phone').value.trim(),
+        emergency_contact: document.getElementById('emergency_contact').value.trim(),
+        address: document.getElementById('address').value.trim()
+      };
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registering Account...';
+
+      try {
+        const authData = await API.registerPatient(payload);
+        API.setAuth(authData.access_token, {
+          user_id: authData.user_id,
+          username: authData.username,
+          role: authData.role,
+          profile_id: authData.profile_id,
+          full_name: authData.full_name
+        });
+
+        showToast('Registration successful! Redirecting to Patient Portal...', 'success');
+        setTimeout(() => {
+          window.location.href = '/patient/index.html';
+        }, 800);
+      } catch (err) {
+        showToast(err.message, 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-user-check"></i> Complete Registration';
+      }
+    }
+  </script>
+</body>
+</html>

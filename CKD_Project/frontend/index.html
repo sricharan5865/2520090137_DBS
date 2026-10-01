@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Chronic Kidney Disease Healthcare Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css?v=6">
+  <style>
+    body {
+      background: url('/assets/medical_bg.png?v=6') no-repeat center top fixed !important;
+      background-size: cover !important;
+      color: var(--c-dark);
+      min-height: 100vh;
+    }
+    .top-navbar {
+      background: rgba(255, 255, 255, 0.88) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid rgba(217, 230, 242, 0.8) !important;
+    }
+    .hero-section {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 20px;
+      position: relative;
+    }
+    .hero-glass-card {
+      background: rgba(255, 255, 255, 0.84);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      border-radius: 28px;
+      padding: 48px 36px;
+      box-shadow: 0 12px 36px rgba(17, 24, 39, 0.08);
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      background: rgba(217, 230, 242, 0.85);
+      border: 1px solid var(--c-ice-border);
+      border-radius: var(--radius-full);
+      color: var(--c-primary);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-size: 46px;
+      font-weight: 800;
+      line-height: 1.18;
+      margin-bottom: 20px;
+      max-width: 900px;
+      color: var(--c-dark);
+    }
+    .hero-title span.accent-blue {
+      color: var(--c-primary);
+    }
+    .hero-title span.accent-green {
+      color: var(--c-accent);
+    }
+    .hero-desc {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 720px;
+      margin: 0 auto 36px auto;
+      line-height: 1.6;
+    }
+    .portal-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .portal-card {
+      background: rgba(255, 255, 255, 0.94) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--c-ice) !important;
+      border-radius: var(--radius-md);
+      padding: 32px 24px;
+      text-align: center;
+      transition: var(--transition);
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 8px 24px rgba(17, 24, 39, 0.05);
+    }
+    .portal-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--c-primary) !important;
+      box-shadow: 0 16px 36px rgba(47, 128, 237, 0.16);
+      background: #FFFFFF !important;
+    }
+    .portal-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-md);
+      background: var(--c-primary);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: var(--glow-primary);
+    }
+    .portal-card h3 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--c-dark);
+    }
+    .portal-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Landing Header -->
+  <header class="top-navbar" style="padding: 0 50px;">
+    <div class="navbar-title">
+      <div class="brand-logo" style="overflow:hidden; padding:0; background:transparent; border-radius:10px;">
+        <img src="/assets/kidney_logo.png?v=6" alt="CKD Logo" style="width:100%; height:100%; object-fit:contain; border-radius:10px; display:block;">
+      </div>
+      <div>
+        <h2 style="font-size: 18px; font-weight: 800; color: var(--c-dark);">CKD SmartCare</h2>
+      </div>
+    </div>
+    <div class="navbar-actions">
+      <a href="/login.html" class="btn btn-secondary"><i class="fa-solid fa-right-to-bracket"></i> Login Portal</a>
+      <a href="/register.html" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Patient Registration</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-glass-card">
+      <div class="hero-badge">
+        <i class="fa-solid fa-shield-virus"></i> Clinical Decision Support System &bull; XGBoost &bull; LightGBM &bull; PostgreSQL
+      </div>
+      <h1 class="hero-title">Smart Chronic Kidney <span class="accent-blue">Disease Risk Prediction</span> & <span class="accent-green">Patient Management</span></h1>
+      <p class="hero-desc">
+        A next-generation hospital workflow platform combining real-time machine learning inference, SHAP-driven explainability, normalized relational database architecture, and strict role-based access control.
+      </p>
+      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <a href="/login.html" class="btn btn-primary" style="padding: 14px 28px; font-size: 15px;">
+          <i class="fa-solid fa-door-open"></i> Access Role Dashboards
+        </a>
+        <a href="/register.html" class="btn btn-secondary" style="padding: 14px 28px; font-size: 15px;">
+          <i class="fa-solid fa-notes-medical"></i> New Patient Intake
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Four Role Portals Grid -->
+  <section style="padding: 50px 0; background: rgba(248, 250, 252, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(217, 230, 242, 0.9); border-bottom: 1px solid rgba(217, 230, 242, 0.9);">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <h2 style="font-size: 28px; font-weight: 800; color: var(--c-dark);">Select Role Portal</h2>
+      <p style="color: var(--text-muted); font-size: 14px;">Dedicated workspaces with tailored permissions and clinical workflows</p>
+    </div>
+
+    <div class="portal-cards-grid">
+      <!-- Patient Portal -->
+      <a href="/login.html?role=PATIENT" class="portal-card">
+        <div class="portal-icon">
+          <i class="fa-solid fa-hospital-user"></i>
+        </div>
+        <h3>Patient Portal</h3>
+        <p>Submit 24-feature medical assessments, schedule appointments, view verified lab reports, and review AI risk predictions.</p>
+        <span class="badge badge-info">Patient Access</span>
+      </a>
+
+      <!-- Doctor Portal -->
+      <a href="/login.html?role=DOCTOR" class="portal-card">
+        <div class="portal-icon" style="background: var(--c-primary);">
+          <i class="fa-solid fa-user-doctor"></i>
+        </div>
+        <h3>Doctor Portal</h3>
+        <p>Explore 360-degree patient histories, run ML predictions, analyze SHAP biomarker contributions, and prescribe treatment plans.</p>
+        <span class="badge badge-info">Doctor Access</span>
+      </a>
+
+      <!-- Staff Portal -->
+      <a href="/login.html?role=STAFF" class="portal-card">
+        <div class="portal-icon" style="background: var(--c-accent);">
+          <i class="fa-solid fa-microscope"></i>
+        </div>
+        <h3>Laboratory / Staff</h3>
+        <p>Receive test requisitions, record clinical parameters, upload diagnostic PDF/image reports, and verify lab panels.</p>
+        <span class="badge badge-success">Staff Access</span>
+      </a>
+
+      <!-- Admin Portal -->
+      <a href="/login.html?role=ADMIN" class="portal-card">
+        <div class="portal-icon" style="background: var(--c-dark);">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <h3>Admin & Analytics</h3>
+        <p>System metrics, user and role administration, prediction distribution charts, audit log tracing, and live SQL query demonstration.</p>
+        <span class="badge badge-purple">Admin Access</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="text-align: center; padding: 40px 20px; border-top: 1px solid rgba(217, 230, 242, 0.9); color: var(--text-dim); font-size: 13px; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+    <p style="font-weight: 600; color: var(--c-dark);">Smart Chronic Kidney Disease Risk Prediction & Patient Management System &copy; 2026</p>
+    <p style="margin-top: 6px; font-size: 12px; color: var(--text-muted);">
+      Disclaimer: ML predictions are intended strictly for clinical decision support and must be evaluated by licensed medical practitioners.
+    </p>
+  </footer>
+
+</body>
+</html>
