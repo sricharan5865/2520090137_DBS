@@ -57,7 +57,7 @@ class CKDExplainer:
         clinical_labels = {
             'hemo': 'Hemoglobin Level',
             'sc': 'Serum Creatinine',
-            'sg': 'Specific Gravity',
+            'sg': 'Urine Specific Gravity',
             'al': 'Albuminuria (Urine Protein)',
             'bu': 'Blood Urea',
             'bgr': 'Blood Glucose Random',

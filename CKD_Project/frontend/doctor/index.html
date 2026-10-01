@@ -583,7 +583,7 @@
           assBox.innerHTML = `
             <div style="font-size:13px; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
               <div><strong>Blood Pressure:</strong> ${a.bp || '-'} mm/Hg</div>
-              <div><strong>Specific Gravity:</strong> ${a.sg || '-'}</div>
+              <div><strong>Urine Specific Gravity:</strong> ${a.sg || '-'}</div>
               <div><strong>Albumin:</strong> ${a.al !== null ? a.al : '-'}</div>
               <div><strong>Sugar:</strong> ${a.su !== null ? a.su : '-'}</div>
               <div><strong>Blood Glucose (BGR):</strong> ${a.bgr || '-'} mg/dL</div>
@@ -760,7 +760,7 @@
                 <div>Hemoglobin: <strong style="color:var(--text-main);">${a.hemo || 'N/A'}</strong> g/dL</div>
                 <div>Blood Glucose: <strong style="color:var(--text-main);">${a.bgr || 'N/A'}</strong> mg/dL</div>
                 <div>Albumin (al): <strong style="color:var(--text-main);">${a.al !== null ? a.al : '0'}</strong></div>
-                <div>Specific Gravity: <strong style="color:var(--text-main);">${a.sg || '1.020'}</strong></div>
+                <div>Urine Specific Gravity: <strong style="color:var(--text-main);">${a.sg || '1.020'}</strong></div>
               </div>
             ` : `
               <p style="font-size:11px; color:var(--text-dim); margin-top:4px;">

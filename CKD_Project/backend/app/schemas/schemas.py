@@ -111,7 +111,7 @@ class MedicalAssessmentCreate(BaseModel):
     # 14 Numeric features
     age: Optional[float] = Field(None, ge=1, le=120, description="Age in years")
     bp: Optional[float] = Field(None, ge=40, le=220, description="Blood Pressure in mm/Hg")
-    sg: Optional[float] = Field(None, description="Specific Gravity: 1.005, 1.010, 1.015, 1.020, 1.025")
+    sg: Optional[float] = Field(None, description="Urine Specific Gravity: 1.005, 1.010, 1.015, 1.020, 1.025")
     al: Optional[float] = Field(None, ge=0, le=5, description="Albumin (0 to 5)")
     su: Optional[float] = Field(None, ge=0, le=5, description="Sugar (0 to 5)")
     bgr: Optional[float] = Field(None, ge=20, le=600, description="Blood Glucose Random (mg/dL)")
