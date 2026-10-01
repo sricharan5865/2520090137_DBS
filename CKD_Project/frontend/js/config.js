@@ -4,13 +4,10 @@
 /**
  * Global Configuration for CKD SmartCare Frontend.
  * 
- * In local development (served by FastAPI):
- *   window.BACKEND_API_URL can remain "" (empty string) so all requests 
- *   use relative path: "/api/..."
- * 
- * In production deployment (e.g., Firebase Hosting frontend + Google Cloud Run backend):
- *   Set window.BACKEND_API_URL to your deployed Cloud Run URL:
- *   window.BACKEND_API_URL = "https://ckd-backend-xxxxx.a.run.app";
+ * Standalone Backend Server (FastAPI + Uvicorn):
+ *   All frontend portals (Patient, Doctor, Staff, Admin) are served directly 
+ *   by the FastAPI backend application on http://localhost:8000.
+ *   window.BACKEND_API_URL defaults to "" so all requests use relative path: "/api/..."
  */
 
 window.BACKEND_API_URL = window.BACKEND_API_URL || "";
